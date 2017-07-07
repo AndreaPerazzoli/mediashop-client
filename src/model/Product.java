@@ -34,6 +34,7 @@ public class Product {
         this.id = ((Double)productInfo.get("id")).intValue();
         this.title = (String) productInfo.get("title");
         this.price = new BigDecimal(productInfo.get("price").toString());
+
         this.storedDate = (Date) productInfo.get("storedDate");
         this.main_genre = (String) productInfo.get("main_genre");
         this.quantity = ((Double)productInfo.get("quantity")).intValue();
@@ -81,10 +82,6 @@ public class Product {
         return bandName;
     }
 
-    public String getMain_genre() {
-        return main_genre;
-    }
-
     public Integer getQuantity() {
         return quantity;
     }
@@ -100,8 +97,6 @@ public class Product {
     public ArrayList<Track> getTracks() {
         return tracks;
     }
-
-
 
     public static Product searchProductBy(Float minPrice, Float maxPrice) throws Exception{
         RestHandler handler = new RestHandler();

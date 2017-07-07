@@ -33,6 +33,8 @@ import java.util.List;
  */
 public class View extends Application{
 
+    ScrollPane scroll = new ScrollPane();
+
     public void start(Stage primaryStage) throws URISyntaxException {
 
         //HOMEPAGE
@@ -44,6 +46,8 @@ public class View extends Application{
 
         HBox.setHgrow(topHBox, Priority.ALWAYS);
 
+
+
         Image i_mediashopLogo = null;
         try {   i_mediashopLogo = new Image(getClass().getResource("assets/mediashop-logo.png").toURI().toString());   }
         catch(URISyntaxException e){ System.out.println(e);}
@@ -54,8 +58,60 @@ public class View extends Application{
         iv_mediashopLogo.setSmooth(true);
         iv_mediashopLogo.setFitHeight(50.0);
 
+
+        ChoiceBox cb_search = new ChoiceBox();
+        cb_search.setItems(FXCollections.observableArrayList(
+                "all", new Separator(),"by genre","by soloist","by bandname")
+        );
+        cb_search.getSelectionModel().selectFirst();
+
+
         TextField searchTextField = new TextField();
         searchTextField.setPromptText("Search...");
+        searchTextField.setMinWidth(400);
+
+        Image i_search = null;
+        try {   i_search = new Image(getClass().getResource("assets/search.png").toURI().toString());   }
+        catch(URISyntaxException e){ System.out.println(e);}
+        ImageView iv_search = new ImageView();
+        iv_search.setPreserveRatio(true);
+        iv_search.setImage(i_search);
+        iv_search.setPreserveRatio(true);
+        iv_search.setSmooth(true);
+        iv_search.setFitHeight(20.0);
+
+        Button btn_search = new Button("",iv_search);
+        btn_search.setOnAction(
+                new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent e) {
+
+                        System.out.print(searchTextField.getText()+cb_search.getValue());
+                        ArrayList<Product> products = new ArrayList<>();
+                        if(cb_search.getValue().equals("by band"))
+                            try { products = Product.getProductsByBand(searchTextField.getText());
+                            } catch (Exception e1) { e1.printStackTrace(); }
+                        else if(cb_search.getValue().equals("by soloist"))
+                            try { products = Product.getProductsBySoloist(searchTextField.getText());
+                            } catch (Exception e1) { e1.printStackTrace(); }
+                        else if(cb_search.getValue().equals("by genre"))
+                            try { products = Product.getProductsByGenre(searchTextField.getText());
+                            } catch (Exception e1) { e1.printStackTrace(); }
+
+                        displayProducts(products);
+                    }
+                }
+        );
+
+
+        Hyperlink l_logout = new Hyperlink("LOG_OUT");
+        l_logout.setVisible(false);
+        Hyperlink l_orders = new Hyperlink("MY ORDERS");
+        l_orders.setVisible(false);
+        Hyperlink l_infos = new Hyperlink("MY INFOS");
+        l_infos.setVisible(false);
+//TODO LOGOUT, MY ORDERS, MY INFOS
+
 
         Hyperlink l_signup = new Hyperlink("SIGN UP");
         l_signup.setOnAction(
@@ -248,9 +304,12 @@ public class View extends Application{
                             actiontarget.setFill(Color.GREEN);
                             actiontarget.setText("Logged in!");
                             l_login.setVisible(false);
+                            l_signup.setVisible(false);
+                            l_logout.setVisible(true);
+                            l_infos.setVisible(true);
+                            l_orders.setVisible(true);
                             logInStage.close();
                             primaryStage.show();
-                            //TODO: RENDI VISIBILI BOTTONI REGISTRAZIONE
                         }
                     }
                 });
@@ -259,14 +318,14 @@ public class View extends Application{
             }
         });
 
-        topHBox.getChildren().addAll(iv_mediashopLogo,l_signup,l_login);
+        topHBox.getChildren().addAll(iv_mediashopLogo,l_signup,l_login,l_orders,l_infos,l_logout);
 
         HBox centerHBox = new HBox(10.0);
         centerHBox.setAlignment(Pos.BOTTOM_RIGHT);
 
         HBox.setHgrow(centerHBox, Priority.ALWAYS);
 
-        centerHBox.getChildren().addAll(searchTextField);
+        centerHBox.getChildren().addAll(cb_search,searchTextField,btn_search);
 
         //CART
         Image i_emptyCart = null;
@@ -290,13 +349,7 @@ public class View extends Application{
         cb_DVD.setIndeterminate(false);
         leftVBox.getChildren().addAll(cb_DVD);
 
-        ChoiceBox cb_genres = new ChoiceBox();
-        cb_genres.setItems(FXCollections.observableArrayList(
-                "Punk Rock", "Classical",
-                new Separator(), "Ambient", "Jazz")
-        );
-        //http://docs.oracle.com/javafx/2/ui_controls/choice-box.htm
-        leftVBox.getChildren().addAll(cb_genres);
+
 
         Slider s_min = new Slider(0, 40, 0.5);
         s_min.setShowTickMarks(true);
@@ -314,12 +367,6 @@ public class View extends Application{
 
         bottomHBox.getChildren().addAll(leftVBox);
 
-        Image i_default = null;
-        try {   i_default = new Image(getClass().getResource("assets/cdDefaultCoverImg.png").toURI().toString());  }
-        catch(URISyntaxException e){ System.out.println(e);}
-
-        TilePane tile = new TilePane();
-        tile.setPrefColumns(3);
 
         ArrayList<Product> allProducts = null;
         try {
@@ -327,6 +374,30 @@ public class View extends Application{
         } catch (Exception e) {
             allProducts = new ArrayList<>();
         }
+        displayProducts(allProducts);
+
+
+
+        bottomHBox.getChildren().addAll(scroll);
+
+        vBox.getChildren().addAll(topHBox, centerHBox, bottomHBox);
+        scene = new Scene(vBox);
+        primaryStage.setTitle("");
+        primaryStage.setMinWidth(1200);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public void displayProducts(ArrayList<Product> allProducts){
+
+        Image i_default = null;
+        try {   i_default = new Image(getClass().getResource("assets/cdDefaultCoverImg.png").toURI().toString());  }
+        catch(URISyntaxException e){ System.out.println(e);}
+
+
+        TilePane tile;
+        tile = new TilePane();
+        tile.setPrefColumns(3);
 
         for(int i=0; i< allProducts.size(); i++){
 
@@ -388,20 +459,14 @@ public class View extends Application{
             container.getChildren().add(infoContainer);
         }
 
-        ScrollPane scroll = new ScrollPane();
+
+
         scroll.setFitToHeight(true);
         scroll.setMinWidth(1000);
         scroll.setContent(tile);
 
-        bottomHBox.getChildren().addAll(scroll);
-
-        vBox.getChildren().addAll(topHBox, centerHBox, bottomHBox);
-        scene = new Scene(vBox);
-        primaryStage.setTitle("");
-        primaryStage.setMinWidth(1200);
-        primaryStage.setScene(scene);
-        primaryStage.show();
     }
+
 
     public static void main(String[] args) {
         launch();

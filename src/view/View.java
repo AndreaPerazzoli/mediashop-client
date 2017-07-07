@@ -52,8 +52,49 @@ public class View extends Application{
         iv_mediashopLogo.setSmooth(true);
         iv_mediashopLogo.setFitHeight(50.0);
 
+
+        ChoiceBox cb_search = new ChoiceBox();
+        cb_search.setItems(FXCollections.observableArrayList(
+                "all", new Separator(),"by genre","by soloist","by bandname")
+        );
+        cb_search.getSelectionModel().selectFirst();
+
+
         TextField searchTextField = new TextField();
         searchTextField.setPromptText("Search...");
+        searchTextField.setMinWidth(400);
+
+        Image i_search = null;
+        try {   i_search = new Image(getClass().getResource("assets/search.png").toURI().toString());   }
+        catch(URISyntaxException e){ System.out.println(e);}
+        ImageView iv_search = new ImageView();
+        iv_search.setPreserveRatio(true);
+        iv_search.setImage(i_search);
+        iv_search.setPreserveRatio(true);
+        iv_search.setSmooth(true);
+        iv_search.setFitHeight(20.0);
+
+        Button btn_search = new Button("",iv_search);
+        btn_search.setOnAction(
+                new EventHandler<ActionEvent>() {
+                    @Override
+                    public void handle(ActionEvent e) {
+
+                        System.out.print(searchTextField.getText()+cb_search.getValue());
+
+
+                    }
+                }
+        );
+
+
+        Hyperlink l_logout = new Hyperlink("LOG_OUT");
+        l_logout.setVisible(false);
+        Hyperlink l_orders = new Hyperlink("MY ORDERS");
+        l_orders.setVisible(false);
+        Hyperlink l_infos = new Hyperlink("MY INFOS");
+        l_infos.setVisible(false);
+
 
         Hyperlink l_signup = new Hyperlink("SIGN UP");
         l_signup.setOnAction(
@@ -246,9 +287,12 @@ public class View extends Application{
                             actiontarget.setFill(Color.GREEN);
                             actiontarget.setText("Logged in!");
                             l_login.setVisible(false);
+                            l_signup.setVisible(false);
+                            l_logout.setVisible(true);
+                            l_infos.setVisible(true);
+                            l_orders.setVisible(true);
                             logInStage.close();
                             primaryStage.show();
-                            //TODO: RENDI VISIBILI BOTTONI REGISTRAZIONE
                         }
                     }
                 });
@@ -257,14 +301,14 @@ public class View extends Application{
             }
         });
 
-        topHBox.getChildren().addAll(iv_mediashopLogo,l_signup,l_login);
+        topHBox.getChildren().addAll(iv_mediashopLogo,l_signup,l_login,l_orders,l_infos,l_logout);
 
         HBox centerHBox = new HBox(10.0);
         centerHBox.setAlignment(Pos.BOTTOM_RIGHT);
 
         HBox.setHgrow(centerHBox, Priority.ALWAYS);
 
-        centerHBox.getChildren().addAll(searchTextField);
+        centerHBox.getChildren().addAll(cb_search,searchTextField,btn_search);
 
         //CART
         Image i_emptyCart = null;
@@ -288,13 +332,7 @@ public class View extends Application{
         cb_DVD.setIndeterminate(false);
         leftVBox.getChildren().addAll(cb_DVD);
 
-        ChoiceBox cb_genres = new ChoiceBox();
-        cb_genres.setItems(FXCollections.observableArrayList(
-                "Punk Rock", "Classical",
-                new Separator(), "Ambient", "Jazz")
-        );
-        //http://docs.oracle.com/javafx/2/ui_controls/choice-box.htm
-        leftVBox.getChildren().addAll(cb_genres);
+
 
         Slider s_min = new Slider(0, 40, 0.5);
         s_min.setShowTickMarks(true);

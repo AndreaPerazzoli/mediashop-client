@@ -15,6 +15,7 @@ public enum UrlList {
     searchProductByPrice("searchProductByPrice"),
     getPurchasedProducts("purchaseHistory"),
     getTrackByProductId("getTrackByProductId"),
+    checkoutProducts("buyProductById"),
     login("login");
 
 

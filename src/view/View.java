@@ -9,6 +9,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
@@ -345,17 +347,19 @@ public class View extends Application{
             Label titleLabel = new Label(allProducts.get(i).getTitle());
             Label artistLabel = new Label();
 
+            System.out.println(allProducts.get(i));
+
             if (allProducts.get(i).getSoloist() == null){
                 artistLabel.setText(allProducts.get(i).getBandName());
             }else{
                 artistLabel.setText(allProducts.get(i).getSoloist().getStageName());
             }
 
-            Label genreLabel = new Label(allProducts.get(i).getMain_genre());
+            //Label genreLabel = new Label(allProducts.get(i).);
 
             Image plus = null;
             try {
-                plus = plus = new Image(getClass().getResource("assets/plus.png").toURI().toString());
+                plus = new Image(getClass().getResource("assets/plus.png").toURI().toString());
             }
             catch(Exception e){
                 System.out.println(e);
@@ -374,7 +378,7 @@ public class View extends Application{
 
             addToCartButton.setTextAlignment(TextAlignment.LEFT);
 
-            Node[] items = {titleLabel, artistLabel, genreLabel, addToCartButton};
+            Node[] items = {titleLabel, artistLabel, /*genreLabel,*/ addToCartButton};
 
             for (Node item: items) {
                 infoContainer.getChildren().add(item);

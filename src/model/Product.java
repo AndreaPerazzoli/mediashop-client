@@ -17,7 +17,6 @@ public class Product {
     private String title;
     private BigDecimal price;
     private Date storeddDate;
-    private String main_genre;
     private Integer quantity;
     private String description;
     private String type;
@@ -35,7 +34,6 @@ public class Product {
         this.title = (String) productInfo.get("title");
         this.price = new BigDecimal(productInfo.get("price").toString());
         this.storeddDate = (Date) productInfo.get("storeddDate");
-        this.main_genre = (String) productInfo.get("main_genre");
         this.quantity = ((Double)productInfo.get("quantity")).intValue();
         this.description = (String) productInfo.get("description");
         this.type = (String) productInfo.get("type");
@@ -81,10 +79,6 @@ public class Product {
         return bandName;
     }
 
-    public String getMain_genre() {
-        return main_genre;
-    }
-
     public Integer getQuantity() {
         return quantity;
     }
@@ -100,8 +94,6 @@ public class Product {
     public ArrayList<Track> getTracks() {
         return tracks;
     }
-
-
 
     public static Product searchProductBy(Float minPrice, Float maxPrice) throws Exception{
         RestHandler handler = new RestHandler();

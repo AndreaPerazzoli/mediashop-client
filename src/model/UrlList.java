@@ -15,11 +15,14 @@ public enum UrlList {
     searchProductByPrice("searchProductByPrice"),
     getPurchasedProducts("purchaseHistory"),
     getTrackByProductId("getTrackByProductId"),
+    getProductByGenre("getProductByGenre"),
+    getProductBySoloist("getProductBySoloist"),
+    getProductByBand("getProductByBand"),
     login("login");
 
 
 
-    private String domain = "http://157.27.136.17:5000/";
+    private String domain = "http://157.27.135.82:5000/";
 
     private UrlList(String str){
         domain += str;

@@ -31,6 +31,8 @@ import java.util.List;
  */
 public class View extends Application{
 
+    ScrollPane scroll = new ScrollPane();
+
     public void start(Stage primaryStage) throws URISyntaxException {
 
         //HOMEPAGE
@@ -41,6 +43,8 @@ public class View extends Application{
         topHBox.setAlignment(Pos.BASELINE_CENTER);
 
         HBox.setHgrow(topHBox, Priority.ALWAYS);
+
+
 
         Image i_mediashopLogo = null;
         try {   i_mediashopLogo = new Image(getClass().getResource("assets/mediashop-logo.png").toURI().toString());   }
@@ -81,8 +85,18 @@ public class View extends Application{
                     public void handle(ActionEvent e) {
 
                         System.out.print(searchTextField.getText()+cb_search.getValue());
+                        ArrayList<Product> products = new ArrayList<>();
+                        if(cb_search.getValue().equals("by band"))
+                            try { products = Product.getProductsByBand(searchTextField.getText());
+                            } catch (Exception e1) { e1.printStackTrace(); }
+                        else if(cb_search.getValue().equals("by soloist"))
+                            try { products = Product.getProductsBySoloist(searchTextField.getText());
+                            } catch (Exception e1) { e1.printStackTrace(); }
+                        else if(cb_search.getValue().equals("by genre"))
+                            try { products = Product.getProductsByGenre(searchTextField.getText());
+                            } catch (Exception e1) { e1.printStackTrace(); }
 
-
+                        displayProducts(products);
                     }
                 }
         );
@@ -94,6 +108,7 @@ public class View extends Application{
         l_orders.setVisible(false);
         Hyperlink l_infos = new Hyperlink("MY INFOS");
         l_infos.setVisible(false);
+//TODO LOGOUT, MY ORDERS, MY INFOS
 
 
         Hyperlink l_signup = new Hyperlink("SIGN UP");
@@ -350,12 +365,6 @@ public class View extends Application{
 
         bottomHBox.getChildren().addAll(leftVBox);
 
-        Image i_default = null;
-        try {   i_default = new Image(getClass().getResource("assets/cdDefaultCoverImg.png").toURI().toString());  }
-        catch(URISyntaxException e){ System.out.println(e);}
-
-        TilePane tile = new TilePane();
-        tile.setPrefColumns(3);
 
         ArrayList<Product> allProducts = null;
         try {
@@ -363,6 +372,30 @@ public class View extends Application{
         } catch (Exception e) {
             e.printStackTrace();
         }
+        displayProducts(allProducts);
+
+
+
+        bottomHBox.getChildren().addAll(scroll);
+
+        vBox.getChildren().addAll(topHBox, centerHBox, bottomHBox);
+        scene = new Scene(vBox);
+        primaryStage.setTitle("");
+        primaryStage.setMinWidth(1200);
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public void displayProducts(ArrayList<Product> allProducts){
+
+        Image i_default = null;
+        try {   i_default = new Image(getClass().getResource("assets/cdDefaultCoverImg.png").toURI().toString());  }
+        catch(URISyntaxException e){ System.out.println(e);}
+
+
+        TilePane tile;
+        tile = new TilePane();
+        tile.setPrefColumns(3);
 
         for(int i=0; i< allProducts.size(); i++){
 
@@ -421,20 +454,14 @@ public class View extends Application{
             container.getChildren().add(infoContainer);
         }
 
-        ScrollPane scroll = new ScrollPane();
+
+
         scroll.setFitToHeight(true);
         scroll.setMinWidth(1000);
         scroll.setContent(tile);
 
-        bottomHBox.getChildren().addAll(scroll);
-
-        vBox.getChildren().addAll(topHBox, centerHBox, bottomHBox);
-        scene = new Scene(vBox);
-        primaryStage.setTitle("");
-        primaryStage.setMinWidth(1200);
-        primaryStage.setScene(scene);
-        primaryStage.show();
     }
+
 
     public static void main(String[] args) {
         launch();

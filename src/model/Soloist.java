@@ -12,8 +12,8 @@ public class Soloist {
     private String birthday;
 
     public Soloist(Map<String,Object> productInfo) {
-        this.stageName = (String)productInfo.get("stageName");
-        this.mainGenre = (String)productInfo.get("mainGenre");
+        this.stageName = (String)productInfo.get("soloist");
+        this.mainGenre = (String)productInfo.get("maingenre");
         this.birthday = (String)productInfo.get("birthday");
 
     }

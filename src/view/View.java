@@ -323,7 +323,7 @@ public class View extends Application{
         try {
             allProducts = Product.getAllProducts();
         } catch (Exception e) {
-            e.printStackTrace();
+            allProducts = new ArrayList<>();
         }
 
         for(int i=0; i< allProducts.size(); i++){
@@ -345,7 +345,7 @@ public class View extends Application{
             Label titleLabel = new Label(allProducts.get(i).getTitle());
             Label artistLabel = new Label();
 
-            if (allProducts.get(i).getSoloist() == null){
+            if (allProducts.get(i).getSoloist().getStageName() == null){
                 artistLabel.setText(allProducts.get(i).getBandName());
             }else{
                 artistLabel.setText(allProducts.get(i).getSoloist().getStageName());
@@ -355,7 +355,7 @@ public class View extends Application{
 
             Image plus = null;
             try {
-                plus = plus = new Image(getClass().getResource("assets/plus.png").toURI().toString());
+                plus  = new Image(getClass().getResource("assets/plus.png").toURI().toString());
             }
             catch(Exception e){
                 System.out.println(e);

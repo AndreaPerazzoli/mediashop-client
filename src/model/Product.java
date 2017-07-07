@@ -16,7 +16,7 @@ public class Product {
     private Integer id;
     private String title;
     private BigDecimal price;
-    private Date storeddDate;
+    private Date storedDate;
     private String main_genre;
     private Integer quantity;
     private String description;
@@ -34,14 +34,14 @@ public class Product {
         this.id = ((Double)productInfo.get("id")).intValue();
         this.title = (String) productInfo.get("title");
         this.price = new BigDecimal(productInfo.get("price").toString());
-        this.storeddDate = (Date) productInfo.get("storeddDate");
+        this.storedDate = (Date) productInfo.get("storedDate");
         this.main_genre = (String) productInfo.get("main_genre");
         this.quantity = ((Double)productInfo.get("quantity")).intValue();
         this.description = (String) productInfo.get("description");
         this.type = (String) productInfo.get("type");
         this.soloist = new Soloist(productInfo);
         this.url_cover = (String) productInfo.get("url_cover");
-        this.bandName = (String) productInfo.get("bandName");
+        this.bandName = (String) productInfo.get("bandname");
 
         tracks = Track.getTracksBy(id);
 
@@ -62,7 +62,7 @@ public class Product {
     }
 
     public Date getStoreddDate() {
-        return storeddDate;
+        return storedDate;
     }
 
     public String getDescription() {
@@ -155,7 +155,7 @@ public class Product {
 
     @Override
     public String toString() {
-        return "{" + id + ", " + title + ", " + price + ", " + storeddDate + ", " + description + ", " + type + ", " + soloist + ", " + bandName + "}";
+        return "{" + id + ", " + title + ", " + price + ", " + storedDate + ", " + description + ", " + type + ", " + soloist + ", " + bandName + "}";
     }
 
     public static void main(String[] args) throws Exception {

@@ -10,7 +10,6 @@ import java.util.Map;
  */
 public class User {
     private String username;
-    // private String password;
     private String fiscalCode;
     private String name;
     private String surname;
@@ -20,9 +19,12 @@ public class User {
 
     public User(){ username = "";}
 
+    /**
+     * User constructor
+     * @param userInfo
+     * */
     public User(Map<String, Object> userInfo){
         username        = (String) userInfo.get("username");
-        //password        = (String) userInfo.get("password");
         fiscalCode      = (String) userInfo.get("fiscalCode");
         name            = (String) userInfo.get("name");
         surname         = (String) userInfo.get("surname");
@@ -57,6 +59,10 @@ public class User {
         return new User();
     }
 
+    /**
+     * Returns the logged user
+     * @param  userInfo
+     * */
     public static User loginWithUser(List<NameValuePair> userInfo){
         try{
             RestHandler handler = new RestHandler();
@@ -80,8 +86,8 @@ public class User {
     }
 
     /*
-    *  Getter
-    * */
+     * Getter
+     * */
     public String getUsername() {
         return username;
     }
@@ -111,8 +117,8 @@ public class User {
     }
 
     /*
-    *  Setter
-    * */
+     * Setter
+     * */
     public void setUsername(String username) {
         this.username = username;
     }
@@ -141,6 +147,10 @@ public class User {
         this.mobileTelephoneNumber = mobileTelephoneNumber;
     }
 
+    /**
+     * Returns true if this and obj had the same username
+     * @param obj
+     * */
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof User){

@@ -18,6 +18,7 @@ public enum UrlList {
     getProductByGenre("getProductByGenre"),
     getProductBySoloist("getProductBySoloist"),
     getProductByBand("getProductByBand"),
+    checkoutProducts("buyProductById"),
     login("login");
 
 

@@ -9,6 +9,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
@@ -17,6 +19,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import model.Cart;
 import model.Product;
 import model.User;
 import org.apache.http.NameValuePair;
@@ -32,6 +35,7 @@ import java.util.List;
 public class View extends Application{
 
     ScrollPane scroll = new ScrollPane();
+    Cart cart = new Cart();
 
     public void start(Stage primaryStage) throws URISyntaxException {
 
@@ -63,7 +67,6 @@ public class View extends Application{
         );
         cb_search.getSelectionModel().selectFirst();
 
-
         TextField searchTextField = new TextField();
         searchTextField.setPromptText("Search...");
         searchTextField.setMinWidth(400);
@@ -86,7 +89,7 @@ public class View extends Application{
 
                         System.out.print(searchTextField.getText()+cb_search.getValue());
                         ArrayList<Product> products = new ArrayList<>();
-                        if(cb_search.getValue().equals("by band"))
+                        if(cb_search.getValue().equals("by bandname"))
                             try { products = Product.getProductsByBand(searchTextField.getText());
                             } catch (Exception e1) { e1.printStackTrace(); }
                         else if(cb_search.getValue().equals("by soloist"))
@@ -334,6 +337,72 @@ public class View extends Application{
         Button b_cart = new Button(new Integer(5).toString(5),iv_cart);
         centerHBox.getChildren().addAll(b_cart);
 
+        b_cart.setOnAction(new EventHandler<ActionEvent>() {
+                               @Override
+                               public void handle(ActionEvent e) {
+                                   Stage cartInStage = new Stage();
+                                   cartInStage.setTitle("CART");
+                                   cartInStage.initModality(Modality.APPLICATION_MODAL);
+                                   cartInStage.initOwner(primaryStage);
+
+                                   VBox v_cart = new VBox();
+
+
+                                   Label l_payment = new Label("PAYMENT METHOD");
+                                   ChoiceBox cb_payment = new ChoiceBox<String>();
+                                   cb_payment.setItems(FXCollections.observableArrayList(
+                                           "PAYPAL","BANKWIRE","CREDIT CARD")
+                                   );
+                                   cb_payment.getSelectionModel().selectFirst();
+
+                                   v_cart.getChildren().addAll(l_payment,cb_payment,new Separator());
+
+//TODO: CHANGE PRODUCTION CODE
+                                   ArrayList<Product> dummyProducts = new ArrayList<>();
+                                   try { dummyProducts = Product.getProductsByGenre("Class");
+                                   } catch (Exception e1) { e1.printStackTrace(); }
+
+                                   for(int i=0; i< dummyProducts.size(); i++){
+
+                                       Label l_name = new Label(dummyProducts.get(i).getTitle());
+                                       v_cart.getChildren().addAll(l_name);
+                                   }
+
+
+
+
+//TODO: AGGIUNGI LISTA PRODOTTI IN CARRELLO OTTENUTA DA QUERY
+
+                                   Button btn_checkout = new Button("CHECKOUT");
+                                   btn_checkout.setOnAction(new EventHandler<ActionEvent>() {
+                                                                @Override
+                                                                public void handle(ActionEvent e) {
+                                                                    Stage cartInStage = new Stage();
+                                                                    cartInStage.setTitle("CART");
+                                                                    cartInStage.initModality(Modality.APPLICATION_MODAL);
+                                                                    cartInStage.initOwner(primaryStage);
+
+                                                                    VBox v_cart = new VBox();
+
+                                                                }
+                                                            }
+                                   );
+
+
+
+                                   v_cart.getChildren().addAll(new Separator(),btn_checkout);
+
+                                   Scene dialog = new Scene(v_cart);
+                                   cartInStage.setScene(dialog);
+                                   cartInStage.setOpacity(0.95);
+                                   cartInStage.setMinWidth(500);
+                                   cartInStage.show();
+
+                               }
+                           }
+        );
+
+
         HBox bottomHBox = new HBox(10.0);
 
         VBox leftVBox = new VBox(5.0);
@@ -370,7 +439,7 @@ public class View extends Application{
         try {
             allProducts = Product.getAllProducts();
         } catch (Exception e) {
-            e.printStackTrace();
+            allProducts = new ArrayList<>();
         }
         displayProducts(allProducts);
 
@@ -416,17 +485,20 @@ public class View extends Application{
             Label titleLabel = new Label(allProducts.get(i).getTitle());
             Label artistLabel = new Label();
 
-            if (allProducts.get(i).getSoloist() == null){
+
+            if (allProducts.get(i).getSoloist().getStageName() == null){
                 artistLabel.setText(allProducts.get(i).getBandName());
             }else{
                 artistLabel.setText(allProducts.get(i).getSoloist().getStageName());
             }
 
-            Label genreLabel = new Label(allProducts.get(i).getMain_genre());
+            //Label genreLabel = new Label(allProducts.get(i).);
 
             Image plus = null;
             try {
-                plus = plus = new Image(getClass().getResource("assets/plus.png").toURI().toString());
+
+                plus  = new Image(getClass().getResource("assets/plus.png").toURI().toString());
+
             }
             catch(Exception e){
                 System.out.println(e);
@@ -445,7 +517,7 @@ public class View extends Application{
 
             addToCartButton.setTextAlignment(TextAlignment.LEFT);
 
-            Node[] items = {titleLabel, artistLabel, genreLabel, addToCartButton};
+            Node[] items = {titleLabel, artistLabel, /*genreLabel,*/ addToCartButton};
 
             for (Node item: items) {
                 infoContainer.getChildren().add(item);

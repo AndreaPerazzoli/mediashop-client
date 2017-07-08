@@ -86,8 +86,6 @@ public class View extends Application{
                 new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent e) {
-
-                        System.out.print(searchTextField.getText()+cb_search.getValue());
                         ArrayList<Product> products = new ArrayList<>();
                         if(cb_search.getValue().equals("by bandname"))
                             try { products = Product.getProductsByBand(searchTextField.getText());
@@ -471,7 +469,8 @@ public class View extends Application{
         tile = new TilePane();
         tile.setPrefColumns(3);
 
-        for(int i=0; i< allProducts.size(); i++){
+        int i;
+        for(i=0; i< allProducts.size(); i++){
 
             VBox container = new VBox(8);
             container.setMaxWidth(320);
@@ -532,7 +531,21 @@ public class View extends Application{
                     plusImageView);
 
             addToCartButton.setTextAlignment(TextAlignment.LEFT);
+            Product p = allProducts.get(i);
+            addToCartButton.setOnAction(
+                    new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent e) {
+                            try {
+                                cart.addItem(p,5);
+                                
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
 
+                        }
+                    }
+            );
             Node[] items = {titleLabel, artistLabel, /*genreLabel,*/ addToCartButton};
 
             for (Node item: items) {

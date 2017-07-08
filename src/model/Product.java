@@ -18,7 +18,8 @@ public class Product {
     private BigDecimal price;
     private Date storedDate;
     private String main_genre;
-    private Integer quantity;
+    //private Integer quantity;
+
     private String description;
     private String type;
     private Soloist soloist;
@@ -37,12 +38,14 @@ public class Product {
 
         this.storedDate = (Date) productInfo.get("storedDate");
         this.main_genre = (String) productInfo.get("main_genre");
-        this.quantity = ((Double)productInfo.get("quantity")).intValue();
+        //this.quantity = ((Double)productInfo.get("quantity")).intValue();
         this.description = (String) productInfo.get("description");
         this.type = (String) productInfo.get("type");
         this.soloist = new Soloist(productInfo);
         this.url_cover = (String) productInfo.get("url_cover");
         this.bandName = (String) productInfo.get("bandname");
+
+
 
         tracks = Track.getTracksBy(id);
 
@@ -82,9 +85,6 @@ public class Product {
         return bandName;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
 
     public String getType() {
         return type;
@@ -98,19 +98,36 @@ public class Product {
         return tracks;
     }
 
-    public static Product searchProductBy(Float minPrice, Float maxPrice) throws Exception{
+    public static ArrayList<Product> searchProductBy(Float minPrice, Float maxPrice) throws Exception{
         RestHandler handler = new RestHandler();
+        ArrayList<Product> productsList = new ArrayList<>();
+
         List<NameValuePair> queryParams = new ArrayList<>();
         queryParams.add(new BasicNameValuePair("minPrice", minPrice.toString()));
         queryParams.add(new BasicNameValuePair("maxPrice", maxPrice.toString()));
-        return new Product(handler.postRequest(UrlList.searchProduct.toString(),queryParams).get(0));
+
+        for(Map<String, Object> productMap : handler.postRequest(UrlList.searchProduct.toString(), queryParams)){
+            productsList.add(new Product(productMap));
+        }
+
+        return productsList;
+
     }
 
-    public static Product searchProductBy(String subject) throws Exception{
+    public static ArrayList<Product> searchProductBy(String subject) throws Exception{
         RestHandler handler = new RestHandler();
+        ArrayList<Product> productsList = new ArrayList<>();
+
         List<NameValuePair> queryParams = new ArrayList<>();
         queryParams.add(new BasicNameValuePair("subject", subject));
-        return new Product(handler.postRequest(UrlList.searchProduct.toString(), queryParams).get(0));
+
+
+        for(Map<String, Object> productMap : handler.postRequest(UrlList.searchProduct.toString(), queryParams)){
+            productsList.add(new Product(productMap));
+        }
+
+        return productsList;
+
     }
 
     public static Product searchProductBy(int id) throws Exception{
@@ -201,5 +218,10 @@ public class Product {
 
     public static void main(String[] args) throws Exception {
         System.out.println();
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

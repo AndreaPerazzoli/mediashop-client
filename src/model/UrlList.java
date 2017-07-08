@@ -15,10 +15,12 @@ public enum UrlList {
     searchProductByPrice("searchProductByPrice"),
     getPurchasedProducts("purchaseHistory"),
     getTrackByProductId("getTrackByProductId"),
+    checkoutProducts("buyProductById"),
     getProductByGenre("getProductByGenre"),
     getProductBySoloist("getProductBySoloist"),
     getProductByBand("getProductByBand"),
-    checkoutProducts("buyProductById"),
+    getAvailability("getAvailability"),
+
     login("login");
 
 

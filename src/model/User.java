@@ -28,12 +28,12 @@ public class User {
      * */
     public User(Map<String, Object> userInfo){
         username        = (String) userInfo.get("username");
-        fiscalCode      = (String) userInfo.get("fiscalCode");
+        fiscalCode      = (String) userInfo.get("fiscalcode");
         name            = (String) userInfo.get("name");
         surname         = (String) userInfo.get("surname");
         city            = (String) userInfo.get("city");
         telephoneNumber = (String) userInfo.get("phone");
-        mobileTelephoneNumber = (String) userInfo.get("mobilePhone");
+        mobileTelephoneNumber = (String) userInfo.get("mobilechone");
     }
 
     /**
@@ -154,5 +154,10 @@ public class User {
             return this.username.equals(((User) obj).username);
         }
         return false;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + username + "," + fiscalCode + "]";
     }
 }

@@ -298,9 +298,10 @@ public class View extends Application{
                         userInfo.add(new BasicNameValuePair("username", username));
                         userInfo.add(new BasicNameValuePair("password", password));
                         try {
-                             u = User.loginWithUser(userInfo);
+                            u = User.loginWithUser(userInfo);
                             actiontarget.setFill(Color.GREEN);
                             actiontarget.setText("Logged in!");
+                            System.out.println(u);
                             l_login.setVisible(false);
                             l_signup.setVisible(false);
                             l_logout.setVisible(true);
@@ -309,8 +310,9 @@ public class View extends Application{
                             logInStage.close();
                             primaryStage.show();
                         }catch (SqlConnectionException sqlexc) {
-                            actiontarget.setFill(Color.FIREBRICK);
-                            actiontarget.setText("Error connecting to db");
+                            sqlexc.printStackTrace();
+                            // actiontarget.setFill(Color.FIREBRICK);
+                            //actiontarget.setText("Error connecting to db");
                         } catch (UserNotRegisteredException unregistered) {
                             actiontarget.setFill(Color.FIREBRICK);
                             actiontarget.setText("wrong username/password");

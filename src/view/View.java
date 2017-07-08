@@ -1,5 +1,8 @@
 package view;
 
+import exceptions.SqlConnectionException;
+import exceptions.RegistrationException;
+import exceptions.UserNotRegisteredException;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,8 +12,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
@@ -33,7 +34,7 @@ import java.util.List;
  * Created by tglfba on 06/07/17.
  */
 public class View extends Application{
-
+    private User u = null;
     ScrollPane scroll = new ScrollPane();
     Cart cart = new Cart();
 
@@ -191,7 +192,6 @@ public class View extends Application{
                         btn_submit.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent event) {
-                                System.out.println("Fired");
                                 List<NameValuePair> params = new ArrayList<>();
 
                                 if (passwordField.getText().equals(checkPasswordField.getText())){
@@ -217,9 +217,10 @@ public class View extends Application{
                                         params.add(new BasicNameValuePair("mobilePhone", mobilePhoneNumberTextField.getText()));
                                     }
 
-                                    params.add(new BasicNameValuePair("favouriteGenre", null));
-                                    User newUser = User.registerNewUser(params);
-                                    if (newUser.getUsername() != null){
+                                    try {
+                                        User newUser = User.registerNewUser(params);
+                                    }catch(SqlConnectionException | RegistrationException err){
+                                        err.printStackTrace();
                                         signupStage.close();
                                     }
                                 }else{
@@ -296,14 +297,8 @@ public class View extends Application{
                         List<NameValuePair> userInfo = new ArrayList<>();
                         userInfo.add(new BasicNameValuePair("username", username));
                         userInfo.add(new BasicNameValuePair("password", password));
-                        User u = User.loginWithUser(userInfo);
-                        if (u == null) {
-                            actiontarget.setFill(Color.FIREBRICK);
-                            actiontarget.setText("Error connecting to db");
-                        } else if (u.equals(new User())) {
-                            actiontarget.setFill(Color.FIREBRICK);
-                            actiontarget.setText("wrong username/password");
-                        } else {
+                        try {
+                             u = User.loginWithUser(userInfo);
                             actiontarget.setFill(Color.GREEN);
                             actiontarget.setText("Logged in!");
                             l_login.setVisible(false);
@@ -313,6 +308,12 @@ public class View extends Application{
                             l_orders.setVisible(true);
                             logInStage.close();
                             primaryStage.show();
+                        }catch (SqlConnectionException sqlexc) {
+                            actiontarget.setFill(Color.FIREBRICK);
+                            actiontarget.setText("Error connecting to db");
+                        } catch (UserNotRegisteredException unregistered) {
+                            actiontarget.setFill(Color.FIREBRICK);
+                            actiontarget.setText("wrong username/password");
                         }
                     }
                 });

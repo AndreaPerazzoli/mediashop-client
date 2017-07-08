@@ -1,4 +1,7 @@
 package model;
+import exceptions.SqlConnectionException;
+import exceptions.RegistrationException;
+import exceptions.UserNotRegisteredException;
 import org.apache.http.NameValuePair;
 
 import java.util.ArrayList;
@@ -39,24 +42,22 @@ public class User {
     * @return an User object
     * */
     public static User registerNewUser(List<NameValuePair> userInfo){
-        try {
-            RestHandler handler = new RestHandler();
-            ArrayList<Map<String, Object>> userRequest = handler.postRequest(UrlList.register.toString(), userInfo);
 
-            if (userRequest.get(0).containsKey("username")) {
-                // it means that this user is already registered
-                System.out.println("Created a new user");
-                return new User(userRequest.get(0));
-            } else if(userRequest.get(0).containsKey("registered")){
-                // create an object User for the new user registered
-                System.out.println("User already registered!");
-            }else{
-                System.out.println("Error!");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        RestHandler handler = new RestHandler();
+        ArrayList<Map<String, Object>> userRequest = handler.postRequest(UrlList.register.toString(), userInfo);
+
+        if (userRequest.get(0).containsKey("username")) {
+            // it means that this user is already registered
+            System.out.println("Created a new user");
+            return new User(userRequest.get(0));
+        } else if(userRequest.get(0).containsKey("registered")){
+            // create an object User for the new user registered
+            throw new RegistrationException((String)userRequest.get(0).get("registered"));
+        }else{
+            System.out.println(userRequest.get(0).get("error"));
+            throw new SqlConnectionException((String)userRequest.get(0).get("error"));
         }
-        return new User();
+
     }
 
     /**
@@ -64,25 +65,21 @@ public class User {
      * @param  userInfo
      * */
     public static User loginWithUser(List<NameValuePair> userInfo){
-        try{
-            RestHandler handler = new RestHandler();
-            ArrayList<Map<String, Object>> userRequest = handler.postRequest(UrlList.login.toString(), userInfo);
 
-            if(userRequest.isEmpty()){
-                // User doesn't exist!
-                return new User();
-            }else if(userRequest.get(0).containsKey("error")){
-                // error in database query
-                return null;
-            }else{
-                // User logged1
-                return new User(userRequest.get(0));
-            }
-        }catch (Exception e){
-            e.printStackTrace();
+        RestHandler handler = new RestHandler();
+        ArrayList<Map<String, Object>> userRequest = handler.postRequest(UrlList.login.toString(), userInfo);
+
+        if(userRequest.isEmpty()){
+            // User doesn't exist!
+            throw new UserNotRegisteredException("User doesn't exist!");
+        }else if(userRequest.get(0).containsKey("error")){
+            // error in database query
+            throw new SqlConnectionException((String)userRequest.get(0).get("error"));
+        }else{
+            // User logged1
+            return new User(userRequest.get(0));
         }
 
-        return null;
     }
 
     /*

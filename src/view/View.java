@@ -98,7 +98,11 @@ public class View extends Application{
                         else if(cb_search.getValue().equals("by genre"))
                             try { products = Product.getProductsByGenre(searchTextField.getText());
                             } catch (Exception e1) { e1.printStackTrace(); }
-
+       /*
+                        else if(cb_search.getValue().equals("all"))
+                            try { products = Product.searchProductBy(searchTextField.getText());
+                            } catch (Exception e1) { e1.printStackTrace(); }
+       */
                         displayProducts(products);
                     }
                 }
@@ -461,6 +465,7 @@ public class View extends Application{
         try {   i_default = new Image(getClass().getResource("assets/cdDefaultCoverImg.png").toURI().toString());  }
         catch(URISyntaxException e){ System.out.println(e);}
 
+        ImageView coverImageView;
 
         TilePane tile;
         tile = new TilePane();
@@ -473,7 +478,18 @@ public class View extends Application{
             container.setMaxHeight(320);
             container.setPadding(new Insets(8,8,8,8));
 
-            ImageView coverImageView = new ImageView(i_default);
+
+            String url_cover = allProducts.get(i).getUrl_cover();
+            Image i_cover;
+            if(url_cover != null)
+                i_cover = new Image(url_cover);
+            else
+                i_cover = i_default;
+
+            coverImageView = new ImageView(i_cover);
+
+
+
             coverImageView.setFitWidth(310);
             coverImageView.setFitHeight(310);
 

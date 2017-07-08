@@ -132,6 +132,52 @@ public class Product {
         return productsList;
     }
 
+    public static ArrayList<Product> getProductsByGenre(String genre) throws Exception{
+        RestHandler handler = new RestHandler();
+        ArrayList<Product> productsList = new ArrayList<>();
+
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("genre", genre));
+
+
+        for(Map<String, Object> productMap : handler.postRequest(UrlList.getProductByGenre.toString(),params)){
+            productsList.add(new Product(productMap));
+        }
+
+        return productsList;
+    }
+
+    public static ArrayList<Product> getProductsBySoloist(String soloist) throws Exception{
+        RestHandler handler = new RestHandler();
+        ArrayList<Product> productsList = new ArrayList<>();
+
+
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("soloist", soloist));
+
+
+        for(Map<String, Object> productMap : handler.postRequest(UrlList.getProductBySoloist.toString(),params)){
+            productsList.add(new Product(productMap));
+        }
+
+        return productsList;
+    }
+
+    public static ArrayList<Product> getProductsByBand(String bandName) throws Exception{
+        RestHandler handler = new RestHandler();
+        ArrayList<Product> productsList = new ArrayList<>();
+
+        List<NameValuePair> params = new ArrayList<>();
+        params.add(new BasicNameValuePair("bandName", bandName));
+
+
+        for(Map<String, Object> productMap : handler.postRequest(UrlList.getProductByBand.toString(),params)){
+            productsList.add(new Product(productMap));
+        }
+
+        return productsList;
+    }
+
     public static ArrayList<Product> getProductsBoughtBy(String username) throws Exception{
         RestHandler handler = new RestHandler();
         ArrayList<Product> productsList = new ArrayList<>();

@@ -2,9 +2,6 @@ package model;
 
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,6 +9,7 @@ import java.util.List;
 /**
  * Created by cristianturetta on 07/07/2017.
  */
+
 public class Cart {
     private HashMap<Integer, Product> addedProduct;
 
@@ -72,9 +70,16 @@ public class Cart {
     }
 
     /**
-     * Return the Cart filled with the product selected by the user
+     * Returns the Cart filled with the product selected by the user
      * */
     public ArrayList<Product> getCartContent(){
         return (ArrayList<Product>)addedProduct.values();
+    }
+
+    /**
+     * Returns the number of products inside the Cart
+     * */
+    public int size(){
+        return this.addedProduct.size();
     }
 }

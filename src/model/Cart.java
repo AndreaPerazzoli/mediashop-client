@@ -17,7 +17,7 @@ public class Cart {
     private HashMap<Integer, Product> addedProduct;
     private HashMap<Integer,Integer> quantityToBuy;
 
-    private boolean checkIfAvailability(Product p, Integer quantity) throws Exception{
+    private boolean checkIfAvailability(Product p, Integer quantity){
         RestHandler handler = new RestHandler();
         List<NameValuePair> params = new ArrayList<>();
 
@@ -25,7 +25,7 @@ public class Cart {
 
         ArrayList<Map<String,Object>> result = handler.postRequest(UrlList.getAvailability.toString(), params);
 
-        if((int)result.get(0).get("quantity") < quantity)
+        if(((Double)result.get(0).get("quantity")).intValue() < quantity)
             return false;
 
         return true;
@@ -63,7 +63,8 @@ public class Cart {
      *
      * @param product
      * */
-    public void addItem(Product product, int quantity) throws Exception {
+    public void addItem(Product product, int quantity)  {
+        if(quantity <= 0) return;
         if(quantityToBuy.containsKey(product.getId())){
             // element already exist in the cart
             quantityToBuy.put(product.getId(), quantityToBuy.get(product.getId()) + quantity);
@@ -79,9 +80,18 @@ public class Cart {
      * Erase the Cart
      * */
     public void emptyCart(){
-        if (addedProduct.isEmpty()) {
+        if (!addedProduct.isEmpty()) {
             addedProduct = new HashMap<>();
             quantityToBuy = new HashMap<>();
+        }
+    }
+
+    public void setProductQuantity(Product p, Integer quantity){
+        if(quantity>0) {
+            addedProduct.put(p.getId(), p);
+            quantityToBuy.put(p.getId(), quantity);
+        }else{
+            removeItem(p);
         }
     }
 
@@ -90,7 +100,7 @@ public class Cart {
      * @param user
      * @param paymentType
      * */
-    public boolean checkoutCart(User user, String paymentType) throws Exception {
+    public boolean checkoutCart(User user, String paymentType) {
 
         for (Product product: this.getCartContent()) {
             if(!checkIfAvailability(product,quantityToBuy.get(product.getId()))) {
@@ -116,9 +126,15 @@ public class Cart {
      * Return the Cart filled with the product selected by the user
      * */
     public ArrayList<Product> getCartContent(){
-        return (ArrayList<Product>)addedProduct.values();
+        ArrayList<Product> result = new ArrayList<>();
+        result.addAll(addedProduct.values());
+        return result;
     }
 
     public int getCartSize(){return addedProduct.size();}
+
+    public Integer getProductQuantity(Product p){
+        return quantityToBuy.get(p.getId());
+    }
 
 }

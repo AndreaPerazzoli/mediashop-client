@@ -18,7 +18,7 @@ public class Product {
     private BigDecimal price;
     private Date storedDate;
     private String main_genre;
-    //private Integer quantity;
+    private Integer quantity;
 
     private String description;
     private String type;
@@ -38,7 +38,7 @@ public class Product {
 
         this.storedDate = (Date) productInfo.get("storedDate");
         this.main_genre = (String) productInfo.get("main_genre");
-        //this.quantity = ((Double)productInfo.get("quantity")).intValue();
+        this.quantity = ((Double)productInfo.get("quantity")).intValue();
         this.description = (String) productInfo.get("description");
         this.type = (String) productInfo.get("type");
         this.soloist = new Soloist(productInfo);
@@ -47,7 +47,8 @@ public class Product {
 
 
 
-        tracks = Track.getTracksBy(id);
+
+       // tracks = Track.getTracksBy(id);
 
     }
 

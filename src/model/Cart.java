@@ -3,9 +3,6 @@ package model;
 import exceptions.BuyingException;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-
-
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -14,6 +11,7 @@ import java.util.Map;
 /**
  * Created by cristianturetta on 07/07/2017.
  */
+
 public class Cart {
     private HashMap<Integer, Product> addedProduct;
     private HashMap<Integer,Integer> quantityToBuy;
@@ -125,7 +123,7 @@ public class Cart {
     }
 
     /**
-     * Return the Cart filled with the product selected by the user
+     * Returns the Cart filled with the product selected by the user
      * */
     public ArrayList<Product> getCartContent(){
         ArrayList<Product> result = new ArrayList<>();
@@ -133,10 +131,16 @@ public class Cart {
         return result;
     }
 
+    /**
+     * Returns the number of products inside the Cart
+     * */
     public int getCartSize(){return addedProduct.size();}
+<<<<<<< HEAD
+=======
 
     public Integer getProductQuantity(Product p){
         return quantityToBuy.get(p.getId());
     }
 
+>>>>>>> 257834a33089e158234158fcc4ea35f64c0a2a1d
 }

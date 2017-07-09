@@ -115,6 +115,22 @@ public class Product {
 
     }
 
+    public static ArrayList<Product> getSuggestedProducts(String username) throws Exception{
+        RestHandler handler = new RestHandler();
+        ArrayList<Product> productsList = new ArrayList<>();
+
+        List<NameValuePair> queryParams = new ArrayList<>();
+        queryParams.add(new BasicNameValuePair("username", username));
+
+
+        for(Map<String, Object> productMap : handler.postRequest(UrlList.getAllProductsPreferredByUsername.toString(), queryParams)){
+            productsList.add(new Product(productMap));
+        }
+
+        return productsList;
+
+    }
+
     public static ArrayList<Product> searchProductBy(String subject) throws Exception{
         RestHandler handler = new RestHandler();
         ArrayList<Product> productsList = new ArrayList<>();

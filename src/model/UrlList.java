@@ -20,7 +20,8 @@ public enum UrlList {
     getProductBySoloist("getProductBySoloist"),
     getProductByBand("getProductByBand"),
     getAvailability("getAvailability"),
-    login("login");
+    login("login"),
+    getAllProductsPreferredByUsername("getAllProductsPreferredByUsername");
 
     private String domain = "http://172.20.10.2:5000/";
 

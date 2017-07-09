@@ -1,5 +1,6 @@
 package view;
 
+import exceptions.BuyingException;
 import exceptions.SqlConnectionException;
 import exceptions.RegistrationException;
 import exceptions.UserNotRegisteredException;
@@ -436,11 +437,14 @@ public class View extends Application{
                                                                     cartInStage.initOwner(primaryStage);
 
                                                                     VBox v_checkout = new VBox();
-                                                                    Label l_checkout = new Label("Checkout non riuscito!");
-                                                                    if(cart.checkoutCart(u,cb_payment.getValue().toString())){
-                                                                        l_checkout.setText("Grazie per l'acquisto!");
-
-
+                                                                    Label l_checkout = new Label("Almeno uno o più prodotti in quantità insufficiente");
+                                                                    try {
+                                                                        if (cart.checkoutCart(u, cb_payment.getValue().toString())) {
+                                                                            l_checkout.setText("Grazie per l'acquisto!");
+                                                                        }
+                                                                    }catch (BuyingException bexc){
+                                                                        l_checkout.setText("Errore nel db!");
+                                                                        bexc.printStackTrace();
                                                                     }
                                                                     v_checkout.getChildren().add(l_checkout);
 

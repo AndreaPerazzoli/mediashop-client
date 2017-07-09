@@ -1,5 +1,6 @@
 package model;
 
+import exceptions.BuyingException;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import java.util.ArrayList;
@@ -114,7 +115,8 @@ public class Cart {
            outgoing.add(new BasicNameValuePair("client", user.getUsername()));
            outgoing.add(new BasicNameValuePair("quantity", quantityToBuy.get(product.getId()).toString()));
 
-           handler.postRequest(UrlList.buyProductById.toString(), outgoing);
+           ArrayList<Map<String,Object>> result = handler.postRequest(UrlList.buyProductById.toString(), outgoing);
+           if(result.get(0).containsKey("error")) throw new BuyingException((String) result.get(0).get("error"));
        }
        emptyCart();
        return true;

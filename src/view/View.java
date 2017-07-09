@@ -5,6 +5,7 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -21,9 +22,12 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Cart;
 import model.Product;
+import model.Track;
 import model.User;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+
+import java.awt.event.MouseEvent;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -477,6 +481,33 @@ public class View extends Application{
             container.setMaxHeight(320);
             container.setPadding(new Insets(8,8,8,8));
 
+            // Product info
+            StackPane coverImageContainer = new StackPane();
+            VBox productInfoContainer = new VBox();
+
+            Label productDescriptionLabel = new Label(allProducts.get(i).getDescription());
+            productDescriptionLabel.setMaxWidth(310);
+            productInfoContainer.getChildren().add(productDescriptionLabel);
+
+            for (Track track: allProducts.get(i).getTracks()){
+                Label trackLabel = new Label(track.getTrack_order() + track.getTitle());
+                trackLabel.setMaxWidth(310);
+                productInfoContainer.getChildren().add(trackLabel);
+            }
+
+            productInfoContainer.setEffect(new GaussianBlur());
+            productInfoContainer.setVisible(false);
+            container.setOnMousePressed(new EventHandler<javafx.scene.input.MouseEvent>() {
+                @Override
+                public void handle(javafx.scene.input.MouseEvent event) {
+                    if (productInfoContainer.isVisible()){
+                        productInfoContainer.setVisible(false);
+                    }else{
+                        productInfoContainer.setVisible(true);
+                    }
+                }
+            });
+            //
 
             String url_cover = allProducts.get(i).getUrl_cover();
             Image i_cover;
@@ -487,12 +518,13 @@ public class View extends Application{
 
             coverImageView = new ImageView(i_cover);
 
-
-
             coverImageView.setFitWidth(310);
             coverImageView.setFitHeight(310);
 
-            container.getChildren().add(coverImageView);
+            coverImageContainer.getChildren().add(coverImageView);
+            coverImageContainer.getChildren().add(productInfoContainer);
+
+            container.getChildren().add(coverImageContainer);
             tile.getChildren().add(container);
 
             VBox infoContainer = new VBox(8);

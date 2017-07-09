@@ -1,5 +1,8 @@
 package view;
 
+import exceptions.SqlConnectionException;
+import exceptions.RegistrationException;
+import exceptions.UserNotRegisteredException;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -9,8 +12,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Modality;
@@ -19,6 +20,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import model.Cart;
 import model.Product;
 import model.User;
 import org.apache.http.NameValuePair;
@@ -32,8 +34,9 @@ import java.util.List;
  * Created by tglfba on 06/07/17.
  */
 public class View extends Application{
-
+    private User u = null;
     ScrollPane scroll = new ScrollPane();
+    Cart cart = new Cart();
 
     public void start(Stage primaryStage) throws URISyntaxException {
 
@@ -65,7 +68,6 @@ public class View extends Application{
         );
         cb_search.getSelectionModel().selectFirst();
 
-
         TextField searchTextField = new TextField();
         searchTextField.setPromptText("Search...");
         searchTextField.setMinWidth(400);
@@ -85,10 +87,8 @@ public class View extends Application{
                 new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent e) {
-
-                        System.out.print(searchTextField.getText()+cb_search.getValue());
                         ArrayList<Product> products = new ArrayList<>();
-                        if(cb_search.getValue().equals("by band"))
+                        if(cb_search.getValue().equals("by bandname"))
                             try { products = Product.getProductsByBand(searchTextField.getText());
                             } catch (Exception e1) { e1.printStackTrace(); }
                         else if(cb_search.getValue().equals("by soloist"))
@@ -97,6 +97,9 @@ public class View extends Application{
                         else if(cb_search.getValue().equals("by genre"))
                             try { products = Product.getProductsByGenre(searchTextField.getText());
                             } catch (Exception e1) { e1.printStackTrace(); }
+                        else if(cb_search.getValue().equals("all"))
+                            try { products = Product.searchProductBy(searchTextField.getText());
+                            } catch (Exception e1) { e1.printStackTrace(); }
 
                         displayProducts(products);
                     }
@@ -104,13 +107,15 @@ public class View extends Application{
         );
 
 
-        Hyperlink l_logout = new Hyperlink("LOG_OUT");
-        l_logout.setVisible(false);
+
+
         Hyperlink l_orders = new Hyperlink("MY ORDERS");
         l_orders.setVisible(false);
         Hyperlink l_infos = new Hyperlink("MY INFOS");
         l_infos.setVisible(false);
-//TODO LOGOUT, MY ORDERS, MY INFOS
+        Hyperlink l_logout = new Hyperlink("LOG_OUT");
+        l_logout.setVisible(false);
+//TODO LOGOUT (set user null), MY ORDERS, MY INFOS
 
 
         Hyperlink l_signup = new Hyperlink("SIGN UP");
@@ -188,7 +193,6 @@ public class View extends Application{
                         btn_submit.setOnAction(new EventHandler<ActionEvent>() {
                             @Override
                             public void handle(ActionEvent event) {
-                                System.out.println("Fired");
                                 List<NameValuePair> params = new ArrayList<>();
 
                                 if (passwordField.getText().equals(checkPasswordField.getText())){
@@ -214,9 +218,10 @@ public class View extends Application{
                                         params.add(new BasicNameValuePair("mobilePhone", mobilePhoneNumberTextField.getText()));
                                     }
 
-                                    params.add(new BasicNameValuePair("favouriteGenre", null));
-                                    User newUser = User.registerNewUser(params);
-                                    if (newUser.getUsername() != null){
+                                    try {
+                                        User newUser = User.registerNewUser(params);
+                                    }catch(SqlConnectionException | RegistrationException err){
+                                        err.printStackTrace();
                                         signupStage.close();
                                     }
                                 }else{
@@ -293,16 +298,11 @@ public class View extends Application{
                         List<NameValuePair> userInfo = new ArrayList<>();
                         userInfo.add(new BasicNameValuePair("username", username));
                         userInfo.add(new BasicNameValuePair("password", password));
-                        User u = User.loginWithUser(userInfo);
-                        if (u == null) {
-                            actiontarget.setFill(Color.FIREBRICK);
-                            actiontarget.setText("Error connecting to db");
-                        } else if (u.equals(new User())) {
-                            actiontarget.setFill(Color.FIREBRICK);
-                            actiontarget.setText("wrong username/password");
-                        } else {
+                        try {
+                            u = User.loginWithUser(userInfo);
                             actiontarget.setFill(Color.GREEN);
                             actiontarget.setText("Logged in!");
+                            System.out.println(u);
                             l_login.setVisible(false);
                             l_signup.setVisible(false);
                             l_logout.setVisible(true);
@@ -310,11 +310,32 @@ public class View extends Application{
                             l_orders.setVisible(true);
                             logInStage.close();
                             primaryStage.show();
+                        }catch (SqlConnectionException sqlexc) {
+                            sqlexc.printStackTrace();
+                            // actiontarget.setFill(Color.FIREBRICK);
+                            //actiontarget.setText("Error connecting to db");
+                        } catch (UserNotRegisteredException unregistered) {
+                            actiontarget.setFill(Color.FIREBRICK);
+                            actiontarget.setText("wrong username/password");
                         }
                     }
                 });
                 logInStage.setScene(dialogScene);
                 logInStage.show();
+            }
+        });
+
+
+        l_logout.setVisible(false);
+        l_logout.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                u = null;
+                l_login.setVisible(true);
+                l_signup.setVisible(true);
+                l_logout.setVisible(false);
+                l_infos.setVisible(false);
+                l_orders.setVisible(false);
             }
         });
 
@@ -333,8 +354,116 @@ public class View extends Application{
         catch(URISyntaxException e){ System.out.println(e);}
         ImageView iv_cart = new ImageView();
         iv_cart.setImage(i_emptyCart);
-        Button b_cart = new Button(new Integer(5).toString(5),iv_cart);
+        Button b_cart = new Button("",iv_cart);
         centerHBox.getChildren().addAll(b_cart);
+
+        b_cart.setOnAction(new EventHandler<ActionEvent>() {
+                               @Override
+                               public void handle(ActionEvent e) {
+                                   Stage cartInStage = new Stage();
+                                   cartInStage.setTitle("CART");
+                                   cartInStage.initModality(Modality.APPLICATION_MODAL);
+                                   cartInStage.initOwner(primaryStage);
+
+                                   VBox v_cart = new VBox();
+
+
+                                   Label l_payment = new Label("PAYMENT METHOD");
+                                   ChoiceBox cb_payment = new ChoiceBox<String>();
+                                   cb_payment.setItems(FXCollections.observableArrayList(
+                                           "Bankwire","Credit Card","Paypal")
+                                   );
+                                   cb_payment.getSelectionModel().selectFirst();
+
+                                   v_cart.getChildren().addAll(l_payment,cb_payment,new Separator());
+
+//TODO: CHANGE PRODUCTION CODE
+                                   ArrayList<Product> cartProducts = cart.getCartContent();
+//                                   try { dummyProducts = Product.getProductsByGenre("Class");
+//                                   } catch (Exception e1) { e1.printStackTrace(); }
+
+                                   for(int i=0; i< cartProducts.size(); i++){
+                                       HBox h_cart = new HBox(5);
+                                       h_cart.setAlignment(Pos.BASELINE_RIGHT);
+
+                                       Product p = cartProducts.get(i);
+                                       Label l_name = new Label(p.getTitle());
+                                       TextField f_quantity = new TextField(cart.getProductQuantity(p).toString());
+
+                                       Button b_changeQuantity = new Button("Change");
+                                       f_quantity.setMinWidth(25);
+
+                                       b_changeQuantity.setOnAction(new EventHandler<ActionEvent>() {
+                                                                        @Override
+                                                                        public void handle(ActionEvent e) {
+                                                                            cart.setProductQuantity(p,Integer.parseInt(f_quantity.getText()));
+
+                                                                        }
+                                                                    });
+
+
+                                       h_cart.getChildren().addAll(l_name, f_quantity, b_changeQuantity);
+                                       v_cart.getChildren().add(h_cart);
+                                   }
+
+
+
+                                   //TODO: rendi invisibile bottone ad utente non autenticato
+
+                                   Button btn_checkout = new Button("CHECKOUT");
+
+                                   if(u == null)
+                                       btn_checkout.setVisible(false);
+                                   else
+                                       btn_checkout.setVisible(true);
+
+                                   btn_checkout.setOnAction(new EventHandler<ActionEvent>() {
+                                                                @Override
+                                                                public void handle(ActionEvent e) {
+
+                                                                    Stage cartInStage = new Stage();
+                                                                    cartInStage.setTitle("CHECKOUT");
+                                                                    cartInStage.initModality(Modality.APPLICATION_MODAL);
+                                                                    cartInStage.initOwner(primaryStage);
+
+                                                                    VBox v_checkout = new VBox();
+                                                                    Label l_checkout = new Label("Checkout non riuscito!");
+                                                                    if(cart.checkoutCart(u,cb_payment.getValue().toString())){
+                                                                        l_checkout.setText("Grazie per l'acquisto!");
+
+
+                                                                    }
+                                                                    v_checkout.getChildren().add(l_checkout);
+
+
+
+
+
+
+                                                                    Scene dialog = new Scene(v_checkout);
+                                                                    cartInStage.setScene(dialog);
+                                                                    cartInStage.setOpacity(0.95);
+                                                                    cartInStage.setMinWidth(50);
+                                                                    cartInStage.show();
+
+                                                                }
+                                                            }
+                                   );
+
+
+
+                                   v_cart.getChildren().addAll(new Separator(),btn_checkout);
+
+                                   Scene dialog = new Scene(v_cart);
+                                   cartInStage.setScene(dialog);
+                                   cartInStage.setOpacity(0.95);
+                                   cartInStage.setMinWidth(500);
+                                   cartInStage.show();
+
+                               }
+                           }
+        );
+
 
         HBox bottomHBox = new HBox(10.0);
 
@@ -394,19 +523,32 @@ public class View extends Application{
         try {   i_default = new Image(getClass().getResource("assets/cdDefaultCoverImg.png").toURI().toString());  }
         catch(URISyntaxException e){ System.out.println(e);}
 
+        ImageView coverImageView;
 
         TilePane tile;
         tile = new TilePane();
         tile.setPrefColumns(3);
 
-        for(int i=0; i< allProducts.size(); i++){
+        int i;
+        for(i=0; i< allProducts.size(); i++){
 
             VBox container = new VBox(8);
             container.setMaxWidth(320);
             container.setMaxHeight(320);
             container.setPadding(new Insets(8,8,8,8));
 
-            ImageView coverImageView = new ImageView(i_default);
+
+            String url_cover = allProducts.get(i).getUrl_cover();
+            Image i_cover;
+            if(url_cover != null)
+                i_cover = new Image(url_cover);
+            else
+                i_cover = i_default;
+
+            coverImageView = new ImageView(i_cover);
+
+
+
             coverImageView.setFitWidth(310);
             coverImageView.setFitHeight(310);
 
@@ -449,7 +591,22 @@ public class View extends Application{
                     plusImageView);
 
             addToCartButton.setTextAlignment(TextAlignment.LEFT);
+            Product p = allProducts.get(i);
+            addToCartButton.setOnAction(
+                    new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent e) {
+                            try {
+                                // TODO : add parametric textfield of quantity
+                                cart.addItem(p,1);
+                                
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
 
+                        }
+                    }
+            );
             Node[] items = {titleLabel, artistLabel, /*genreLabel,*/ addToCartButton};
 
             for (Node item: items) {

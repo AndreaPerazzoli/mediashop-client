@@ -19,6 +19,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import model.Cart;
 import model.Product;
 import model.User;
 import org.apache.http.NameValuePair;
@@ -34,6 +35,7 @@ import java.util.List;
 public class View extends Application{
 
     ScrollPane scroll = new ScrollPane();
+    Cart cart = new Cart();
 
     public void start(Stage primaryStage) throws URISyntaxException {
 
@@ -65,7 +67,6 @@ public class View extends Application{
         );
         cb_search.getSelectionModel().selectFirst();
 
-
         TextField searchTextField = new TextField();
         searchTextField.setPromptText("Search...");
         searchTextField.setMinWidth(400);
@@ -85,10 +86,8 @@ public class View extends Application{
                 new EventHandler<ActionEvent>() {
                     @Override
                     public void handle(ActionEvent e) {
-
-                        System.out.print(searchTextField.getText()+cb_search.getValue());
                         ArrayList<Product> products = new ArrayList<>();
-                        if(cb_search.getValue().equals("by band"))
+                        if(cb_search.getValue().equals("by bandname"))
                             try { products = Product.getProductsByBand(searchTextField.getText());
                             } catch (Exception e1) { e1.printStackTrace(); }
                         else if(cb_search.getValue().equals("by soloist"))
@@ -97,7 +96,11 @@ public class View extends Application{
                         else if(cb_search.getValue().equals("by genre"))
                             try { products = Product.getProductsByGenre(searchTextField.getText());
                             } catch (Exception e1) { e1.printStackTrace(); }
-
+       /*
+                        else if(cb_search.getValue().equals("all"))
+                            try { products = Product.searchProductBy(searchTextField.getText());
+                            } catch (Exception e1) { e1.printStackTrace(); }
+       */
                         displayProducts(products);
                     }
                 }
@@ -336,6 +339,72 @@ public class View extends Application{
         Button b_cart = new Button(new Integer(5).toString(5),iv_cart);
         centerHBox.getChildren().addAll(b_cart);
 
+        b_cart.setOnAction(new EventHandler<ActionEvent>() {
+                               @Override
+                               public void handle(ActionEvent e) {
+                                   Stage cartInStage = new Stage();
+                                   cartInStage.setTitle("CART");
+                                   cartInStage.initModality(Modality.APPLICATION_MODAL);
+                                   cartInStage.initOwner(primaryStage);
+
+                                   VBox v_cart = new VBox();
+
+
+                                   Label l_payment = new Label("PAYMENT METHOD");
+                                   ChoiceBox cb_payment = new ChoiceBox<String>();
+                                   cb_payment.setItems(FXCollections.observableArrayList(
+                                           "PAYPAL","BANKWIRE","CREDIT CARD")
+                                   );
+                                   cb_payment.getSelectionModel().selectFirst();
+
+                                   v_cart.getChildren().addAll(l_payment,cb_payment,new Separator());
+
+//TODO: CHANGE PRODUCTION CODE
+                                   ArrayList<Product> dummyProducts = new ArrayList<>();
+                                   try { dummyProducts = Product.getProductsByGenre("Class");
+                                   } catch (Exception e1) { e1.printStackTrace(); }
+
+                                   for(int i=0; i< dummyProducts.size(); i++){
+
+                                       Label l_name = new Label(dummyProducts.get(i).getTitle());
+                                       v_cart.getChildren().addAll(l_name);
+                                   }
+
+
+
+
+//TODO: AGGIUNGI LISTA PRODOTTI IN CARRELLO OTTENUTA DA QUERY
+
+                                   Button btn_checkout = new Button("CHECKOUT");
+                                   btn_checkout.setOnAction(new EventHandler<ActionEvent>() {
+                                                                @Override
+                                                                public void handle(ActionEvent e) {
+                                                                    Stage cartInStage = new Stage();
+                                                                    cartInStage.setTitle("CART");
+                                                                    cartInStage.initModality(Modality.APPLICATION_MODAL);
+                                                                    cartInStage.initOwner(primaryStage);
+
+                                                                    VBox v_cart = new VBox();
+
+                                                                }
+                                                            }
+                                   );
+
+
+
+                                   v_cart.getChildren().addAll(new Separator(),btn_checkout);
+
+                                   Scene dialog = new Scene(v_cart);
+                                   cartInStage.setScene(dialog);
+                                   cartInStage.setOpacity(0.95);
+                                   cartInStage.setMinWidth(500);
+                                   cartInStage.show();
+
+                               }
+                           }
+        );
+
+
         HBox bottomHBox = new HBox(10.0);
 
         VBox leftVBox = new VBox(5.0);
@@ -394,19 +463,32 @@ public class View extends Application{
         try {   i_default = new Image(getClass().getResource("assets/cdDefaultCoverImg.png").toURI().toString());  }
         catch(URISyntaxException e){ System.out.println(e);}
 
+        ImageView coverImageView;
 
         TilePane tile;
         tile = new TilePane();
         tile.setPrefColumns(3);
 
-        for(int i=0; i< allProducts.size(); i++){
+        int i;
+        for(i=0; i< allProducts.size(); i++){
 
             VBox container = new VBox(8);
             container.setMaxWidth(320);
             container.setMaxHeight(320);
             container.setPadding(new Insets(8,8,8,8));
 
-            ImageView coverImageView = new ImageView(i_default);
+
+            String url_cover = allProducts.get(i).getUrl_cover();
+            Image i_cover;
+            if(url_cover != null)
+                i_cover = new Image(url_cover);
+            else
+                i_cover = i_default;
+
+            coverImageView = new ImageView(i_cover);
+
+
+
             coverImageView.setFitWidth(310);
             coverImageView.setFitHeight(310);
 
@@ -449,7 +531,21 @@ public class View extends Application{
                     plusImageView);
 
             addToCartButton.setTextAlignment(TextAlignment.LEFT);
+            Product p = allProducts.get(i);
+            addToCartButton.setOnAction(
+                    new EventHandler<ActionEvent>() {
+                        @Override
+                        public void handle(ActionEvent e) {
+                            try {
+                                cart.addItem(p,5);
+                                
+                            } catch (Exception e1) {
+                                e1.printStackTrace();
+                            }
 
+                        }
+                    }
+            );
             Node[] items = {titleLabel, artistLabel, /*genreLabel,*/ addToCartButton};
 
             for (Node item: items) {

@@ -91,7 +91,9 @@ public class Cart {
     public boolean checkoutCart(User user, String paymentType) throws Exception {
 
         for (Product product: this.getCartContent()) {
-            if(!checkIfAvailability(product,quantityToBuy.get(product.getId()))) return false;
+            if(!checkIfAvailability(product,quantityToBuy.get(product.getId()))) {
+                return false;
+            }
         }
 
        RestHandler handler = new RestHandler();
@@ -104,6 +106,7 @@ public class Cart {
 
            handler.postRequest(UrlList.buyProductById.toString(), outgoing);
        }
+       emptyCart();
        return true;
     }
 

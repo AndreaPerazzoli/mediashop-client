@@ -20,6 +20,7 @@ public enum UrlList {
     getProductBySoloist("getProductBySoloist"),
     getProductByBand("getProductByBand"),
     getAvailability("getAvailability"),
+
     login("login");
 
 

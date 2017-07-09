@@ -25,7 +25,7 @@ public enum UrlList {
 
 
 
-    private String domain = "http://157.27.135.82:5000/";
+    private String domain = "http://172.20.10.2:5000/";
 
     private UrlList(String str){
         domain += str;

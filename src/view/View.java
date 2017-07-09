@@ -8,6 +8,11 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
+import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -22,9 +27,13 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.Cart;
 import model.Product;
+import model.Track;
 import model.User;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
+
+import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -537,6 +546,45 @@ public class View extends Application{
             container.setMaxHeight(320);
             container.setPadding(new Insets(8,8,8,8));
 
+            StackPane coverImageContainer = new StackPane();
+            VBox productInfoContainer = new VBox();
+            productInfoContainer.setPadding(new Insets(24,8,8,8));
+            productInfoContainer.setStyle("-fx-background-color: white;");
+
+            Label descriptionLabel = new Label("Description:");
+            Label productDescriptionLabel = new Label(allProducts.get(i).getDescription());
+            productDescriptionLabel.setWrapText(true);
+            productDescriptionLabel.setTextAlignment(TextAlignment.JUSTIFY);
+            productDescriptionLabel.setMaxWidth(310);
+
+            Label trackDescriptionLabel = new Label("\nTracks:\n");
+            trackDescriptionLabel.setWrapText(true);
+
+            Node[] viewItems = {descriptionLabel, productDescriptionLabel, trackDescriptionLabel};
+            for (Node item:viewItems){
+                productInfoContainer.getChildren().add(item);
+            }
+
+            for (Track track: allProducts.get(i).getTracks()){
+                Label trackLabel = new Label(track.getTrack_order() + ") " + track.getTitle());
+                trackLabel.setMaxWidth(310);
+                trackLabel.setPadding(new Insets(0,0,0,16));
+                productInfoContainer.getChildren().add(trackLabel);
+            }
+
+            productInfoContainer.setOpacity(0.8);
+            productInfoContainer.setVisible(false);
+            container.setOnMousePressed(new EventHandler<javafx.scene.input.MouseEvent>() {
+                @Override
+                public void handle(javafx.scene.input.MouseEvent event) {
+                    if (productInfoContainer.isVisible()){
+                        productInfoContainer.setVisible(false);
+                    }else{
+                        productInfoContainer.setVisible(true);
+                    }
+                }
+            });
+            //
 
             String url_cover = allProducts.get(i).getUrl_cover();
             Image i_cover;
@@ -547,12 +595,13 @@ public class View extends Application{
 
             coverImageView = new ImageView(i_cover);
 
-
-
             coverImageView.setFitWidth(310);
             coverImageView.setFitHeight(310);
 
-            container.getChildren().add(coverImageView);
+            coverImageContainer.getChildren().add(coverImageView);
+            coverImageContainer.getChildren().add(productInfoContainer);
+
+            container.getChildren().add(coverImageContainer);
             tile.getChildren().add(container);
 
             VBox infoContainer = new VBox(8);

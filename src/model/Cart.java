@@ -133,12 +133,8 @@ public class Cart {
      * Returns the number of products inside the Cart
      * */
     public int getCartSize(){return addedProduct.size();}
-<<<<<<< HEAD
-=======
 
     public Integer getProductQuantity(Product p){
         return quantityToBuy.get(p.getId());
     }
-
->>>>>>> 257834a33089e158234158fcc4ea35f64c0a2a1d
 }

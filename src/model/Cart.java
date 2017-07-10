@@ -1,6 +1,7 @@
 package model;
 
 import exceptions.BuyingException;
+import exceptions.EmptyCartException;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 import java.util.ArrayList;
@@ -16,11 +17,11 @@ public class Cart {
     private HashMap<Integer, Product> addedProduct;
     private HashMap<Integer,Integer> quantityToBuy;
 
-    private boolean checkIfAvailability(Product p, Integer quantity){
+    private boolean checkIfAvailability(Product product, Integer quantity){
         RestHandler handler = new RestHandler();
         List<NameValuePair> params = new ArrayList<>();
 
-        params.add(new BasicNameValuePair("id",p.getId().toString()));
+        params.add(new BasicNameValuePair("id",product.getId().toString()));
 
         ArrayList<Map<String,Object>> result = handler.postRequest(UrlList.getAvailability.toString(), params);
 
@@ -85,12 +86,12 @@ public class Cart {
         }
     }
 
-    public void setProductQuantity(Product p, Integer quantity){
+    public void setProductQuantity(Product product, Integer quantity){
         if(quantity>0) {
-            addedProduct.put(p.getId(), p);
-            quantityToBuy.put(p.getId(), quantity);
+            addedProduct.put(product.getId(), product);
+            quantityToBuy.put(product.getId(), quantity);
         }else{
-            removeItem(p);
+            removeItem(product);
         }
     }
 
@@ -106,6 +107,8 @@ public class Cart {
                 return false;
             }
         }
+
+        if(getCartSize() == 0) throw new EmptyCartException();
 
        RestHandler handler = new RestHandler();
        for (Product product: this.getCartContent()){
@@ -136,7 +139,7 @@ public class Cart {
      * */
     public int getCartSize(){return addedProduct.size();}
 
-    public Integer getProductQuantity(Product p){
-        return quantityToBuy.get(p.getId());
+    public Integer getProductQuantity(Product product){
+        return quantityToBuy.get(product.getId());
     }
 }

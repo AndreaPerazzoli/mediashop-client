@@ -27,9 +27,7 @@ public class Product {
     private String url_cover;
     private ArrayList<Track> tracks;
 
-    public Product(){
-        title = "";
-    }
+
 
     public Product(Map<String,Object> productInfo) throws Exception{
         this.id = ((Double)productInfo.get("id")).intValue();
@@ -48,7 +46,7 @@ public class Product {
 
 
 
-       // tracks = Track.getTracksBy(id);
+       tracks = Track.getTracksBy(id);
 
     }
 
@@ -74,9 +72,6 @@ public class Product {
         return description;
     }
 
-    public String getType_product() {
-        return type;
-    }
 
     public Soloist getSoloist() {
         return soloist;
@@ -91,7 +86,7 @@ public class Product {
         return type;
     }
 
-    public String getUrl_cover() {
+    public String getUrlCover() {
         return url_cover;
     }
 

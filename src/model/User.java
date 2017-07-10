@@ -20,8 +20,6 @@ public class User {
     private String telephoneNumber;
     private String mobileTelephoneNumber;
 
-    public User(){ username = "";}
-
     /**
      * User constructor
      * @param userInfo

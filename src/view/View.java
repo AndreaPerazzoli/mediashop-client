@@ -13,7 +13,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
-import javafx.scene.effect.GaussianBlur;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
@@ -33,8 +32,6 @@ import model.User;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
-import java.awt.*;
-import java.awt.event.MouseEvent;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -590,7 +587,7 @@ public class View extends Application{
             });
             //
 
-            String url_cover = allProducts.get(i).getUrl_cover();
+            String url_cover = allProducts.get(i).getUrlCover();
             Image i_cover;
             if(url_cover != null)
                 i_cover = new Image(url_cover);

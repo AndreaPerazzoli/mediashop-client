@@ -48,6 +48,10 @@ public class Track {
         return tracksArrayList;
     }
 
+    public String getTrackWithPosition(){
+        return getTrack_order() + ") " + getTitle();
+    }
+
     @Override
     public String toString() {
         return "[" + title + "," + track_order + "]";

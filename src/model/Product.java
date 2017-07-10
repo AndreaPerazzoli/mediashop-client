@@ -35,7 +35,6 @@ public class Product {
         this.id = ((Double)productInfo.get("id")).intValue();
         this.title = (String) productInfo.get("title");
         this.price = new BigDecimal(productInfo.get("price").toString());
-
         this.storedDate = (Date) productInfo.get("storedDate");
         this.main_genre = (String) productInfo.get("main_genre");
         this.quantity = ((Double)productInfo.get("quantity")).intValue();
@@ -44,12 +43,7 @@ public class Product {
         this.soloist = new Soloist(productInfo);
         this.url_cover = (String) productInfo.get("url_cover");
         this.bandName = (String) productInfo.get("bandname");
-
-
-
-
-       // tracks = Track.getTracksBy(id);
-
+        this.tracks = Track.getTracksBy(id);
     }
 
 
@@ -80,6 +74,10 @@ public class Product {
 
     public Soloist getSoloist() {
         return soloist;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
     }
 
     public String getBandName() {
@@ -122,8 +120,12 @@ public class Product {
         List<NameValuePair> queryParams = new ArrayList<>();
         queryParams.add(new BasicNameValuePair("username", username));
 
+        ArrayList<Map<String,Object>> queryResult = handler.postRequest(UrlList.getAllProductsPreferredByUsername.toString(), queryParams);
+        if (queryResult.get(0).containsKey("preferred")){
+            return new ArrayList<Product>();
+        }
 
-        for(Map<String, Object> productMap : handler.postRequest(UrlList.getAllProductsPreferredByUsername.toString(), queryParams)){
+        for(Map<String, Object> productMap : queryResult){
             productsList.add(new Product(productMap));
         }
 

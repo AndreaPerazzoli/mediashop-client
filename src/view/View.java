@@ -189,7 +189,6 @@ public class View extends Application{
         usernameLink.setVisible(false);
         myOrdrdesLink.setVisible(false);
         logoutLink.setVisible(false);
-        setupHorizontalLayouts(container, elements);
     }
 
     /**
@@ -527,6 +526,7 @@ public class View extends Application{
         topGridPane.add(searchItemsContainer,1,0);
 
         userInfoContainer.setAlignment(Pos.CENTER);
+        setupHorizontalLayouts(userInfoContainer, UserItems);
         initUserItems(userInfoContainer, UserItems);
 
         topGridPane.add(userInfoContainer, 2,0);

@@ -6,7 +6,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import view.View;
+import view.HomeView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,11 +17,11 @@ import java.util.List;
  */
 
 public class ClickListener implements EventHandler<ActionEvent>{
-    private View view;
+    private HomeView homeView;
     private Stage primaryStage;
 
-    public ClickListener(View view, Stage primaryStage){
-        this.view = view;
+    public ClickListener(HomeView homeView, Stage primaryStage){
+        this.homeView = homeView;
         this.primaryStage = primaryStage;
     }
 
@@ -30,76 +30,80 @@ public class ClickListener implements EventHandler<ActionEvent>{
         Object eventSourceObject = event.getSource();
 
         // gestione tasto ricerca prodotti
-        if(view.searchButton.equals(eventSourceObject)){
+        if(homeView.searchButton.equals(eventSourceObject)){
             try {
-                view.searchIt(view.scrollContainer);
+                homeView.searchIt(homeView.scrollContainer);
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
         // gestione tasto carrello
-        else if(view.cartButton.equals(eventSourceObject)){
-            view.showCart(primaryStage);
+        else if(homeView.cartButton.equals(eventSourceObject)){
+            homeView.showCart(primaryStage);
         }
 
         //gestione hyperlink login
-        else if(view.loginLink.equals(eventSourceObject)){
-            view.loging(primaryStage);
+        else if(homeView.loginLink.equals(eventSourceObject)){
+            homeView.loging(primaryStage);
         }
-
         // gestione hyperlink sign up
-        else if(view.signupLink.equals(eventSourceObject)){
-            view.signingUp(primaryStage);
-        }
-
-        // gestione tasto pop-up login
-        else if(view.loginButton.equals(eventSourceObject)){
-            List<NameValuePair> params = new ArrayList<>();
-            params.add(new BasicNameValuePair("username", view.loginPopUpUsernameTextField.getText()));
-            params.add(new BasicNameValuePair("password", view.loginPopUpPswField.getText()));
-            view.loginRequest(params);
+        else if(homeView.signupLink.equals(eventSourceObject)){
+            homeView.signingUp(primaryStage);
         }
 
         // Gestione submit button in sign up pop-up
-        else if (view.submitRegistationButton.equals(eventSourceObject)){
+        else if (homeView.submitRegistationButton.equals(eventSourceObject)){
             System.out.println("fired");
             List<NameValuePair> params = new ArrayList<>();
-            if (view.passwordField.getText().equals(view.checkPasswordField.getText())){
-                view.passwordCheckResultLabel.setText("Correct password");
-                view.passwordCheckResultLabel.setTextFill(Color.GREEN);
-                view.passwordCheckResultLabel.setVisible(true);
-                params.add(new BasicNameValuePair("username", view.usernameTextField.getText()));
-                params.add(new BasicNameValuePair("password", view.passwordField.getText()));
-                params.add(new BasicNameValuePair("fiscalCode", view.fiscalCodeTextField.getText()));
-                params.add(new BasicNameValuePair("name", view.nameTextField.getText()));
-                params.add(new BasicNameValuePair("surname", view.surnameTexField.getText()));
-                params.add(new BasicNameValuePair("city", view.cityTextField.getText()));
+            if (homeView.signUpPopUpPasswordField.getText().equals(homeView.signUpPopUpCheckPasswordField.getText())){
+                homeView.passwordCheckResultLabel.setText("Correct password");
+                homeView.passwordCheckResultLabel.setTextFill(Color.GREEN);
+                homeView.passwordCheckResultLabel.setVisible(true);
+                params.add(new BasicNameValuePair("username", homeView.usernameTextField.getText()));
+                params.add(new BasicNameValuePair("password", homeView.signUpPopUpPasswordField.getText()));
+                params.add(new BasicNameValuePair("fiscalCode", homeView.fiscalCodeTextField.getText()));
+                params.add(new BasicNameValuePair("name", homeView.nameTextField.getText()));
+                params.add(new BasicNameValuePair("surname", homeView.surnameTexField.getText()));
+                params.add(new BasicNameValuePair("city", homeView.cityTextField.getText()));
 
-                if (view.telephoneNumberTextField.getText().equals("")){
+                if (homeView.telephoneNumberTextField.getText().equals("")){
                     params.add(new BasicNameValuePair("phone", null));
                 }else{
-                    params.add(new BasicNameValuePair("phone", view.telephoneNumberTextField.getText()));
+                    params.add(new BasicNameValuePair("phone", homeView.telephoneNumberTextField.getText()));
                 }
 
-                if (view.mobilePhoneNumberTextField.getText().equals("")){
+                if (homeView.mobilePhoneNumberTextField.getText().equals("")){
                     params.add(new BasicNameValuePair("mobilePhone", null));
                 }else{
-                    params.add(new BasicNameValuePair("mobilePhone", view.mobilePhoneNumberTextField.getText()));
+                    params.add(new BasicNameValuePair("mobilePhone", homeView.mobilePhoneNumberTextField.getText()));
                 }
 
-                view.sigupRequest(params);
+                homeView.sigupRequest(params);
             }else{
                 System.out.println("psw errate");
-                view.passwordCheckResultLabel.setText("Passwords are differents");
-                view.passwordCheckResultLabel.setTextFill(Color.RED);
-                view.passwordCheckResultLabel.setVisible(true);
+                homeView.passwordCheckResultLabel.setText("Passwords are differents");
+                homeView.passwordCheckResultLabel.setTextFill(Color.RED);
+                homeView.passwordCheckResultLabel.setVisible(true);
             }
         }
-
         // gestione hyperlink logout
-        else if(view.logoutLink.equals(eventSourceObject)){
-            view.loggingOut();
+        else if(homeView.logoutLink.equals(eventSourceObject)){
+            homeView.loggingOut();
+        }
+        else if(homeView.suggestedForMe.equals(eventSourceObject)){
+            try {
+                homeView.displaySuggestedProducts();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        // gestione tasto pop-up login
+        else if(homeView.loginPopUpButton.equals(eventSourceObject)){
+            List<NameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("username", homeView.loginPopUpUsernameTextField.getText()));
+            params.add(new BasicNameValuePair("password", homeView.loginPopUpPswField.getText()));
+            homeView.loginRequest(params);
         }
         else {
             System.out.println("Error");

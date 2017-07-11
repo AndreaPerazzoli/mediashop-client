@@ -50,7 +50,7 @@ public class HomeView extends Application{
      * */
     private User loggedUser = null;
     private ArrayList<Product> allProducts = null;
-    private Cart cart = new Cart();
+    private Cart cart = Cart.getInstance();
     private ClickListener listener;
     private Timeline timer = new Timeline(new KeyFrame(
             Duration.millis(300),

@@ -11,6 +11,7 @@ import java.util.*;
  */
 
 public class Cart implements Iterable<Product> {
+    private static Cart cart = new Cart();
     private HashMap<Integer, Product> addedProduct;
     private HashMap<Integer,Integer> quantityToBuy;
 
@@ -32,18 +33,16 @@ public class Cart implements Iterable<Product> {
     /**
      * Construct an empty Cart
      * */
-    public Cart(){
+    private Cart(){
         addedProduct = new HashMap<Integer, Product>();
         quantityToBuy = new HashMap<>();
     }
 
 
 
-    public Cart(Product p, int quantity) throws Exception {
-        addedProduct = new HashMap<Integer, Product>();
-        quantityToBuy = new HashMap<>();
-
-        addItem(p, quantity);
+    public static Cart getInstance(){
+        cart.emptyCart();
+        return cart;
     }
 
     /**
@@ -144,23 +143,27 @@ public class Cart implements Iterable<Product> {
     }
 
     private class CartIterator implements Iterator{
-        int index = 1;
+        int index = 0;
+
         @Override
         public boolean hasNext() {
-            return index <= addedProduct.size();
+            return index < addedProduct.size();
         }
 
         @Override
         public Product next() {
-            return addedProduct.get(index++);
+            return addedProduct.values().toArray(new Product[addedProduct.size()])[index++];
         }
     }
 
     public static void main(String[] args) throws Exception {
         Cart c = new Cart();
         for (Product p: Product.getAllProducts()) {
-            c.addItem(p,1);
+            if(p.getId() != 2)
+              c.addItem(p,1);
         }
+
+
 
         for (Product product : c){
             System.out.println(product);

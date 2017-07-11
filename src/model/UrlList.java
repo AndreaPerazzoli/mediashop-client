@@ -23,7 +23,7 @@ public enum UrlList {
     login("login"),
     getAllProductsPreferredByUsername("getAllProductsPreferredByUsername");
 
-    private String domain = "http://157.27.135.82:5000/";
+    private String domain = "http://0.0.0.0:5000/";
 
     private UrlList(String str){
         domain += str;

@@ -95,33 +95,4 @@ public class RestHandler {
 
 
     }
-
-    public static void main(String[] args) throws Exception {
-        RestHandler handler = new RestHandler();
-
-        List<NameValuePair> l = new ArrayList<>();
-
-        //l.add(new BasicNameValuePair("idProduct", "1"));
-
-        l.add(new BasicNameValuePair("username", "PsychoAndreaFroci"));
-        l.add(new BasicNameValuePair("password", "ebreobruciacchiato"));
-        l.add(new BasicNameValuePair("city", "Lamecca"));
-        l.add(new BasicNameValuePair("fiscalCode", "vbqertyuiopasdfg"));
-        l.add(new BasicNameValuePair("name", "Andrea"));
-        l.add(new BasicNameValuePair("surname", "Perazzoli"));
-        l.add(new BasicNameValuePair("phone", "+38423762347823"));
-        l.add(new BasicNameValuePair("mobilePhone", "+434273462784"));
-        l.add(new BasicNameValuePair("favouriteGenre", "Rap"));
-
-
-        /*
-        Scanner scnanner = new Scanner(System.in);
-        System.out.println("search: ");
-        String find = scnanner.nextLine();
-        l.add(new BasicNameValuePair("title", find));
-
-        System.out.println(handler.postRequest(UrlList.searchProduct.toString(), l));
-    */
-
-    }
 }

@@ -121,7 +121,7 @@ public class Product {
         queryParams.add(new BasicNameValuePair("username", username));
 
         ArrayList<Map<String,Object>> queryResult = handler.postRequest(UrlList.getAllProductsPreferredByUsername.toString(), queryParams);
-        if (queryResult.get(0).containsKey("preferred")){
+        if (queryResult.isEmpty()){
             return new ArrayList<Product>();
         }
 
@@ -229,14 +229,9 @@ public class Product {
         return productsList;
     }
 
-
     @Override
     public String toString() {
         return "{" + id + ", " + title + ", " + price + ", " + storedDate + ", " + description + ", " + type + ", " + soloist + ", " + bandName + "}";
-    }
-
-    public static void main(String[] args) throws Exception {
-        System.out.println();
     }
 
     @Override

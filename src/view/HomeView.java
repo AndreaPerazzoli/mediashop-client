@@ -1,3 +1,6 @@
+/**
+ * Created by cristianturetta on 10/07/17.
+ */
 package view;
 
 import Controller.ClickListener;
@@ -5,6 +8,8 @@ import exceptions.BuyingException;
 import exceptions.SqlConnectionException;
 import exceptions.RegistrationException;
 import exceptions.UserNotRegisteredException;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -14,6 +19,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
+import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -26,32 +32,33 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import model.Cart;
 import model.Product;
 import model.Track;
 import model.User;
 import org.apache.http.NameValuePair;
-import org.apache.http.message.BasicNameValuePair;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Timer;
 
-
-/**
- * Created by Cristian Turetta on 10/07/17.
- */
-public class View extends Application{
+public class HomeView extends Application{
     /**
      * Data
      * */
     private User loggedUser = null;
     private ArrayList<Product> allProducts = null;
     private Cart cart = new Cart();
-    ClickListener listener;
+    private ClickListener listener;
+    private Timeline timer = new Timeline(new KeyFrame(
+            Duration.millis(300),
+            actionEvent -> addToCartFeedBackEnd()
+    ));
 
     /**
-     * View Components
+     * HomeView Components
      * */
     public VBox sceneConainer = new VBox(8);
     public GridPane topGridPane = new GridPane();
@@ -66,30 +73,37 @@ public class View extends Application{
     public TextField searchBarTextField = new TextField();
     public Button searchButton;
 
+    public Hyperlink suggestedForMe = new Hyperlink("Suggested for me...");
+
     public Hyperlink loginLink = new Hyperlink("LogIn");
     public Hyperlink signupLink = new Hyperlink("SignUp");
     public Hyperlink logoutLink = new Hyperlink("LogOut");
     public Hyperlink usernameLink = new Hyperlink();
-    public Hyperlink myOrdrdesLink = new Hyperlink("My orders");
-    public Node[] UserItems = {loginLink, signupLink, usernameLink, myOrdrdesLink, logoutLink};
+    public Hyperlink myOrdersLink = new Hyperlink("My orders");
+    public Node[] userItems = {loginLink, signupLink, usernameLink, myOrdersLink, logoutLink};
 
     public Button cartButton;
+    public Label cartFeedBackLabel = new Label("Added");
 
-    // Login pop-up
+    /**
+     * Log in Pop-up items
+     * */
     Stage logInStage;
-    public Button loginButton;
+    public Button loginPopUpButton;
     public PasswordField loginPopUpPswField = new PasswordField();
     public TextField loginPopUpUsernameTextField = new TextField();
-    public Label loginFeedbackLabel = new Label("Wrong username or password");
+    public Label loginPopUpFeedbackLabel = new Label("Wrong username or password");
 
-    // Signup pop-up
-    Stage signupStage;
+    /**
+     * Sign up Pop-up items
+     * */
+    Stage signUpStage;
     public Label usernameLabel;
     public TextField usernameTextField;
-    Label passwordLabel;
-    public PasswordField passwordField;
-    Label checkPasswordLabel;
-    public PasswordField checkPasswordField;
+    Label signUpPopUpPasswordLabel;
+    public PasswordField signUpPopUpPasswordField;
+    Label signUpPopUpCheckPasswordLabel;
+    public PasswordField signUpPopUpCheckPasswordField;
     public Label passwordCheckResultLabel;
     Label fiscalCodeLabel;
     public TextField fiscalCodeTextField;
@@ -178,30 +192,30 @@ public class View extends Application{
 
     /**
      * Init view for non-logged users
-     * @param elements
      * @param container
      * */
-    private void initUserItems(HBox container, Node[] elements){
+    private void initUserItems(HBox container){
         container.setAlignment(Pos.CENTER);
-        container.setMinWidth(300);
+        container.setMinWidth(350);
         loginLink.setVisible(true);
         signupLink.setVisible(true);
         usernameLink.setVisible(false);
-        myOrdrdesLink.setVisible(false);
+        myOrdersLink.setVisible(false);
         logoutLink.setVisible(false);
+        suggestedForMe.setVisible(false);
     }
 
     /**
      * Init view for logged users
-     * @param elements
      * @param container
      * @param authUser
      * */
-    private void initUserItems(HBox container, Node[] elements, User authUser){
+    private void initUserItems(HBox container, User authUser){
         container.setAlignment(Pos.CENTER);
-        container.setMinWidth(300);
+        container.setMinWidth(350);
         usernameLink.setVisible(true);
-        myOrdrdesLink.setVisible(true);
+        myOrdersLink.setVisible(true);
+        suggestedForMe.setVisible(true);
         logoutLink.setVisible(true);
         loginLink.setVisible(false);
         signupLink.setVisible(false);
@@ -228,6 +242,13 @@ public class View extends Application{
                 break;
         }
         displayProducts(allProducts, scroll);
+    }
+
+    /**
+     * Display the products suggested for the specific user
+     * */
+    public void displaySuggestedProducts() throws Exception {
+        displayProducts(Product.getSuggestedProducts(loggedUser.getUsername()),scrollContainer);
     }
 
     /**
@@ -264,17 +285,17 @@ public class View extends Application{
         iview.setSmooth(true);
         iview.setCache(true);
 
-        loginButton = new Button("LOGIN",iview);
-        loginButton.setOnAction(listener);
+        loginPopUpButton = new Button("LOGIN",iview);
+        loginPopUpButton.setOnAction(listener);
 
         HBox hbBtn = new HBox(10);
         hbBtn.setAlignment(Pos.BASELINE_RIGHT);
-        hbBtn.getChildren().add(loginButton);
+        hbBtn.getChildren().add(loginPopUpButton);
         grid.add(hbBtn, 1, 3);
 
-        loginFeedbackLabel.setVisible(false);
+        loginPopUpFeedbackLabel.setVisible(false);
 
-        grid.add(loginFeedbackLabel, 1, 5);
+        grid.add(loginPopUpFeedbackLabel, 1, 5);
 
         Scene dialogScene = new Scene(grid, 300, 200);
 
@@ -290,7 +311,7 @@ public class View extends Application{
         try {
             loggedUser = User.loginWithUser(params);
             if (loggedUser != null){
-                initUserItems(userInfoContainer, UserItems, loggedUser);
+                initUserItems(userInfoContainer, loggedUser);
                 logInStage.close();
             }
 
@@ -298,8 +319,8 @@ public class View extends Application{
             e.printStackTrace();
         }catch (UserNotRegisteredException e){
             // display user o psw errata
-            loginFeedbackLabel.setTextFill(Color.FIREBRICK);
-            loginFeedbackLabel.setVisible(true);
+            loginPopUpFeedbackLabel.setTextFill(Color.FIREBRICK);
+            loginPopUpFeedbackLabel.setVisible(true);
         }
     }
 
@@ -308,10 +329,10 @@ public class View extends Application{
      * @param primaryStage
      * */
     public void signingUp(Stage primaryStage){
-        signupStage = new Stage();
-        signupStage.setTitle("SIGN UP");
-        signupStage.initModality(Modality.APPLICATION_MODAL);
-        signupStage.initOwner(primaryStage);
+        signUpStage = new Stage();
+        signUpStage.setTitle("SIGN UP");
+        signUpStage.initModality(Modality.APPLICATION_MODAL);
+        signUpStage.initOwner(primaryStage);
 
         // Grid settings
         VBox v_signup = new VBox(8);
@@ -321,13 +342,13 @@ public class View extends Application{
         usernameTextField = new TextField();
         usernameTextField.setPromptText("Username");
 
-        passwordLabel = new Label("Password");
-        passwordField = new PasswordField();
-        passwordField.setPromptText("Type a password");
+        signUpPopUpPasswordLabel = new Label("Password");
+        signUpPopUpPasswordField = new PasswordField();
+        signUpPopUpPasswordField.setPromptText("Type a password");
 
-        checkPasswordLabel = new Label("Rewrite Password");
-        checkPasswordField = new PasswordField();
-        checkPasswordField.setPromptText("Retype the password");
+        signUpPopUpCheckPasswordLabel = new Label("Rewrite Password");
+        signUpPopUpCheckPasswordField = new PasswordField();
+        signUpPopUpCheckPasswordField.setPromptText("Retype the password");
 
         passwordCheckResultLabel = new Label();
         passwordCheckResultLabel.setVisible(false);
@@ -364,8 +385,8 @@ public class View extends Application{
         wrapper.setAlignment(Pos.BASELINE_RIGHT);
         wrapper.setPadding(new Insets(8,0,0,0));
 
-        Node[] fields = {usernameLabel, usernameTextField, passwordLabel,
-                passwordField, checkPasswordLabel, checkPasswordField,
+        Node[] fields = {usernameLabel, usernameTextField, signUpPopUpPasswordLabel,
+                signUpPopUpPasswordField, signUpPopUpCheckPasswordLabel, signUpPopUpCheckPasswordField,
                 passwordCheckResultLabel, fiscalCodeLabel, fiscalCodeTextField, nameLabel,
                 nameTextField, surnameLabel, surnameTexField,
                 cityLabel, cityTextField, telephoneLabel,
@@ -380,17 +401,25 @@ public class View extends Application{
         v_signup.isFillWidth();
         Scene dialogScene = new Scene(v_signup);
 
-        signupStage.setScene(dialogScene);
-        signupStage.setOpacity(0.95);
-        signupStage.setMinWidth(500);
-        signupStage.show();
+        signUpStage.setScene(dialogScene);
+        signUpStage.setOpacity(0.95);
+        signUpStage.setMinWidth(500);
+        signUpStage.show();
 
     }
 
-
+    /**
+     * Called by the listener when a user want to sign up
+     * @param params
+     * */
     public void sigupRequest(List<NameValuePair> params){
         try {
-            User.registerNewUser(params);
+            User retUser = User.registerNewUser(params);
+            if (retUser == null){
+                System.out.println("user gia reg");
+            }else{
+                signUpStage.close();
+            }
         }catch (RegistrationException e){
             e.printStackTrace();
             //TODO: insert a dialog
@@ -403,7 +432,7 @@ public class View extends Application{
      * */
     public void loggingOut() {
         loggedUser = null;
-        initUserItems(userInfoContainer, UserItems);
+        initUserItems(userInfoContainer);
     }
 
     /**
@@ -446,7 +475,12 @@ public class View extends Application{
                 @Override
                 public void handle(ActionEvent e) {
                     cart.setProductQuantity(p,Integer.parseInt(f_quantity.getText()));
-
+                    if (cart.getCartSize() == 0){
+                        cartButton.setGraphic(initImageView("assets/cart.png",17,17));
+                        cartButton.setText("");
+                    }else{
+                        cartButton.setText(cart.getCartSize() + "");
+                    }
                 }
             });
 
@@ -466,6 +500,8 @@ public class View extends Application{
                 try {
                     if (cart.checkoutCart(loggedUser, cb_payment.getValue().toString())) {
                         l_checkout.setText("Grazie per l'acquisto!");
+                        cartButton.setGraphic(initImageView("assets/cart.png",17,17));
+                        cartButton.setText("");
                     }
                 }catch (BuyingException bexc){
                     l_checkout.setText("Errore nel db!");
@@ -506,42 +542,32 @@ public class View extends Application{
         scrollContainer.setContent(tile);
     }
 
-    public void start(Stage primaryStage) throws Exception {
-        listener = new ClickListener(this, primaryStage);
-
-        loginLink.setOnAction(listener);
-        signupLink.setOnAction(listener);
-        logoutLink.setOnAction(listener);
-
-        initNewWindowWhit(primaryStage, sceneConainer, 1200, 800);
-        ImageView mediashopLogoImageView = initImageView("assets/mediashop-logo.png", 250,50);
-        setupHorizontalLayouts(logoContiner, mediashopLogoImageView, new Insets(8,8,8,8));
-
-        topGridPane.add(logoContiner,0,0);
-
-        initSearchItems();
-        Node[] searchItems = {searchFilterChoiceBox, searchBarTextField, searchButton};
-        setupHorizontalLayouts(searchItemsContainer, searchItems);
-
-        topGridPane.add(searchItemsContainer,1,0);
-
-        userInfoContainer.setAlignment(Pos.CENTER);
-        setupHorizontalLayouts(userInfoContainer, UserItems);
-        initUserItems(userInfoContainer, UserItems);
-
-        topGridPane.add(userInfoContainer, 2,0);
-
-        cartButton = new Button("", initImageView("assets/cart.png",17,17));
-        cartButton.setOnAction(listener);
-        setupHorizontalLayouts(cartContainer, cartButton, new Insets(24,8,8,8));
-
-        topGridPane.add(cartContainer, 3,0);
-
-        initScrollContainer(scrollContainer, tile);
-        sceneConainer.getChildren().add(topGridPane);
-        sceneConainer.getChildren().add(scrollContainer);
-
-        displayProducts(Product.getAllProducts(), scrollContainer);
+    /**
+     * Sets listener on LogoIcon when mouse is clicked, enters and exits
+     * */
+    private void setLogoListener(){
+        logoContiner.setOnMouseEntered(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                logoContiner.setEffect(new DropShadow());
+            }
+        });
+        logoContiner.setOnMouseExited(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                logoContiner.setEffect(null);
+            }
+        });
+        logoContiner.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                try {
+                    displayProducts(Product.getAllProducts(), scrollContainer);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     public void displayProducts(ArrayList<Product> products, ScrollPane scroll){
@@ -603,6 +629,8 @@ public class View extends Application{
             @Override
             public void handle(ActionEvent event) {
                 cart.addItem(product, 1);
+                addToCartFeedBack();
+                timer.play();
                 //TODO: create a counter
             }
         });
@@ -641,6 +669,24 @@ public class View extends Application{
         for (Node item: items) {
             container.getChildren().add(item);
         }
+    }
+
+    /**
+     * Show a pop-up that in order to give a feedback to the user when a product
+     * is added
+     * */
+    private void addToCartFeedBack(){
+        cartButton.setGraphic(initImageView("assets/cart-filled.png",17,17));
+        cartButton.setText(cart.getCartSize() + "");
+        cartFeedBackLabel.setTextFill(Color.GREEN);
+        cartFeedBackLabel.setVisible(true);
+    }
+
+    /**
+     * Remove the feedback pop-up after 3 secs
+     * */
+    private void addToCartFeedBackEnd(){
+        cartFeedBackLabel.setVisible(false);
     }
 
     /**
@@ -692,6 +738,54 @@ public class View extends Application{
         });
 
 
+    }
+
+    /**
+     * Init the Scene
+     * @param primaryStage
+     * */
+    public void start(Stage primaryStage) throws Exception {
+        listener = new ClickListener(this, primaryStage);
+        setLogoListener();
+        suggestedForMe.setOnAction(listener);
+        loginLink.setOnAction(listener);
+        signupLink.setOnAction(listener);
+        logoutLink.setOnAction(listener);
+
+        initNewWindowWhit(primaryStage, sceneConainer, 1200, 800);
+        ImageView mediashopLogoImageView = initImageView("assets/mediashop-logo.png", 250,50);
+        setupHorizontalLayouts(logoContiner, mediashopLogoImageView, new Insets(8,8,8,8));
+
+        topGridPane.add(logoContiner,0,0);
+
+        initSearchItems();
+        Node[] searchItems = {searchFilterChoiceBox, searchBarTextField, searchButton};
+        setupHorizontalLayouts(searchItemsContainer, searchItems);
+
+        topGridPane.add(searchItemsContainer,1,0);
+
+        userInfoContainer.setAlignment(Pos.CENTER);
+        setupHorizontalLayouts(userInfoContainer, userItems);
+        initUserItems(userInfoContainer);
+
+        topGridPane.add(userInfoContainer, 2,0);
+
+        cartButton = new Button("", initImageView("assets/cart.png",17,17));
+        cartButton.setOnAction(listener);
+        setupHorizontalLayouts(cartContainer, cartButton, new Insets(24,8,8,8));
+
+        topGridPane.add(cartContainer, 3,0);
+
+        initScrollContainer(scrollContainer, tile);
+        sceneConainer.getChildren().add(topGridPane);
+        sceneConainer.getChildren().add(scrollContainer);
+
+        cartFeedBackLabel.setVisible(false);
+        topGridPane.add(suggestedForMe, 1,1);
+        topGridPane.add(cartFeedBackLabel,3,1);
+
+        primaryStage.show();
+        displayProducts(Product.getAllProducts(), scrollContainer);
     }
 
     public static void main(String[] args) {

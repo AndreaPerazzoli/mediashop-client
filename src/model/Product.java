@@ -235,9 +235,7 @@ public class Product {
         return "{" + id + ", " + title + ", " + price + ", " + storedDate + ", " + description + ", " + type + ", " + soloist + ", " + bandName + "}";
     }
 
-    public static void main(String[] args) throws Exception {
-        System.out.println();
-    }
+
 
     @Override
     public int hashCode() {

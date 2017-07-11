@@ -84,6 +84,7 @@ public class Product {
         return bandName;
     }
 
+    public String getMain_genre() {return  main_genre;}
 
     public String getType() {
         return type;
@@ -121,7 +122,7 @@ public class Product {
         queryParams.add(new BasicNameValuePair("username", username));
 
         ArrayList<Map<String,Object>> queryResult = handler.postRequest(UrlList.getAllProductsPreferredByUsername.toString(), queryParams);
-        if (queryResult.isEmpty()){
+        if (queryResult.isEmpty() || queryResult.get(0).containsKey("preferred")){
             return new ArrayList<Product>();
         }
 

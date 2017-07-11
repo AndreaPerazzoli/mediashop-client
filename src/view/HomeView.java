@@ -426,12 +426,14 @@ public class HomeView extends Application{
         }
     }
 
-
     /**
      * Log out the current user
      * */
     public void loggingOut() {
         loggedUser = null;
+        cart.emptyCart();
+        cartButton.setGraphic(initImageView("assets/cart.png",17,17));
+        cartButton.setText("");
         initUserItems(userInfoContainer);
     }
 
@@ -538,7 +540,9 @@ public class HomeView extends Application{
      * @param tile
      * */
     private void initScrollContainer(ScrollPane container, TilePane tile){
-        container.setMinSize(600, 650);
+        //container.setMinSize(600, 650);
+        container.setMinWidth(600);
+        container.setMinHeight(610);
         scrollContainer.setContent(tile);
     }
 
@@ -573,11 +577,12 @@ public class HomeView extends Application{
     public void displayProducts(ArrayList<Product> products, ScrollPane scroll){
         int i;
         tile = new TilePane();
+        tile.setMinHeight(450);
         tile.setPrefColumns(4);
         for(i=0; i< products.size(); i++){
             VBox container = new VBox(8);
-            container.setMinSize(290,400);
-            container.setMaxSize(290,400);
+            container.setMinSize(290,450);
+            container.setMaxSize(290,450);
             container.setPadding(new Insets(8));
 
             String coverUrl = products.get(i).getUrl_cover();
@@ -589,6 +594,7 @@ public class HomeView extends Application{
             setProductDetailsContainer(coverImageContainer, coverImageView, products.get(i));
 
             container.getChildren().add(coverImageContainer);
+
             tile.getChildren().add(container);
 
             VBox infoContainer = new VBox(8);
@@ -604,7 +610,7 @@ public class HomeView extends Application{
      * @param footer
      * @param product
      * */
-    private void setProductInfoFooterContainer(HBox footer, Product product){
+    private void setProductInfoFooterContainer(VBox footer, Product product){
         footer.setAlignment(Pos.CENTER);
         Label availableLabel = new Label("n° " + product.getQuantity());
 
@@ -613,17 +619,23 @@ public class HomeView extends Application{
         ImageView productTypeImageView = new ImageView();
         switch (product.getType()){
             case "CD":
-                productTypeImageView = initImageView("assets/cd-filled.png",32,24);
+                productTypeImageView = initImageView("assets/cd-filled.png",24,24);
                 break;
             case "DVD":
                 productTypeImageView = initImageView("assets/dvd-filled.png", 32,24);
                 break;
         }
 
-        Node[] footerItems = {availableLabel, addToCartButton, productTypeImageView};
+        footer.getChildren().add(addToCartButton);
+        HBox infoContainer = new HBox(8);
+        infoContainer.setAlignment(Pos.CENTER);
+
+        Node[] footerItems = {availableLabel, productTypeImageView};
         for (Node item:footerItems) {
-            footer.getChildren().add(item);
+            infoContainer.getChildren().add(item);
         }
+
+        footer.getChildren().add(infoContainer);
 
         addToCartButton.setOnAction(new EventHandler<ActionEvent>() {
             @Override
@@ -661,10 +673,12 @@ public class HomeView extends Application{
         Label artistLabel = new Label();
         setProductInfoArtistLabel(product, artistLabel);
 
-        HBox footerContainer = new HBox();
+        Label genreLabel = new Label(product.getMain_genre());
+
+        VBox footerContainer = new VBox(8);
         setProductInfoFooterContainer(footerContainer, product);
 
-        Node[] items = {titleLabel, artistLabel, footerContainer};
+        Node[] items = {titleLabel, artistLabel, genreLabel, footerContainer};
 
         for (Node item: items) {
             container.getChildren().add(item);

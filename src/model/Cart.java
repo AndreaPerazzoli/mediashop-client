@@ -3,16 +3,14 @@ package model;
 import exceptions.BuyingException;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 
 /**
  * Created by cristianturetta on 07/07/2017.
  */
 
-public class Cart {
+public class Cart implements Iterable<Product> {
     private HashMap<Integer, Product> addedProduct;
     private HashMap<Integer,Integer> quantityToBuy;
 
@@ -138,5 +136,36 @@ public class Cart {
 
     public Integer getProductQuantity(Product p){
         return quantityToBuy.get(p.getId());
+    }
+
+    @Override
+    public Iterator iterator() {
+        return new CartIterator();
+    }
+
+    private class CartIterator implements Iterator{
+        int index = 1;
+        @Override
+        public boolean hasNext() {
+            return index <= addedProduct.size();
+        }
+
+        @Override
+        public Product next() {
+            return addedProduct.get(index++);
+        }
+    }
+
+    public static void main(String[] args) throws Exception {
+        Cart c = new Cart();
+        for (Product p: Product.getAllProducts()) {
+            c.addItem(p,1);
+        }
+
+        for (Product product : c){
+            System.out.println(product);
+        }
+
+
     }
 }

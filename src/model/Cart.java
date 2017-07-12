@@ -1,6 +1,7 @@
 package model;
 
 import exceptions.BuyingException;
+import exceptions.EmptyCartException;
 import org.apache.http.NameValuePair;
 import org.apache.http.message.BasicNameValuePair;
 
@@ -105,6 +106,8 @@ public class Cart implements Iterable<Product> {
      * @param paymentType
      * */
     public boolean checkoutCart(User user, String paymentType) {
+
+        if(this.getCartSize() == 0) throw new EmptyCartException();
 
         for (Product product: this.getCartContent()) {
             if(!checkIfAvailability(product,quantityToBuy.get(product.getId()))) {

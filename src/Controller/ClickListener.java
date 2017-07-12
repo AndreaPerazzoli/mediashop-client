@@ -89,6 +89,8 @@ public class ClickListener implements EventHandler<ActionEvent>{
             if(param.getText().equals("")){
                 param.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
                 count++;
+            }else{
+                param.setStyle(null);
             }
         }
         if (count == 0){

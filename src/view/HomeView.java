@@ -42,7 +42,6 @@ import org.apache.http.NameValuePair;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
 
 public class HomeView extends Application{
     /**
@@ -119,6 +118,7 @@ public class HomeView extends Application{
     public TextField mobilePhoneNumberTextField;
     HBox wrapper;
     public Button submitRegistationButton = new Button("Submit");
+    Label userAlreadyRegisteredLabel = new Label("User already registered!");
 
     /**
      * Initialize the stage whit the given pane dimensions
@@ -380,10 +380,18 @@ public class HomeView extends Application{
 
 
         wrapper = new HBox();
+        // Label already registered
+        userAlreadyRegisteredLabel.setVisible(false);
+        userAlreadyRegisteredLabel.setTextFill(Color.FIREBRICK);
+        wrapper.getChildren().add(userAlreadyRegisteredLabel);
+
         wrapper.getChildren().add(submitRegistationButton);
         submitRegistationButton.setOnAction(listener);
         wrapper.setAlignment(Pos.BASELINE_RIGHT);
         wrapper.setPadding(new Insets(8,0,0,0));
+
+
+
 
         Node[] fields = {usernameLabel, usernameTextField, signUpPopUpPasswordLabel,
                 signUpPopUpPasswordField, signUpPopUpCheckPasswordLabel, signUpPopUpCheckPasswordField,
@@ -417,13 +425,15 @@ public class HomeView extends Application{
         try {
             User retUser = User.registerNewUser(params);
             if (retUser == null){
+
                 System.out.println("user gia reg");
             }else{
                 signUpStage.close();
             }
         }catch (RegistrationException e){
-            e.printStackTrace();
+            userAlreadyRegisteredLabel.setVisible(true);
             //TODO: insert a dialog
+
         }
     }
 

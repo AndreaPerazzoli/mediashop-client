@@ -404,6 +404,7 @@ public class HomeView extends Application{
         signUpStage.setScene(dialogScene);
         signUpStage.setOpacity(0.95);
         signUpStage.setMinWidth(500);
+        signUpStage.setMinHeight(690);
         signUpStage.show();
 
     }

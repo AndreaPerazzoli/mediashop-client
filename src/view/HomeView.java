@@ -502,31 +502,42 @@ public class HomeView extends Application{
             v_cart.getChildren().add(h_cart);
         }
 
+        Label totalPriceLabel = new Label("Total: " + cart.getCartPrice() + " €" );
+        totalPriceLabel.setPadding(new Insets(8));
+        v_cart.getChildren().add(totalPriceLabel);
         Button btn_checkout = new Button("CHECKOUT");
+        btn_checkout.setPadding(new Insets(8));
 
         btn_checkout.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
-                cart.checkoutCart(loggedUser,cb_payment.getValue().toString());
-                VBox v_checkout = new VBox();
-                Label l_checkout = new Label("Almeno uno o più prodotti in quantità insufficiente");
-                try {
-                    if (cart.checkoutCart(loggedUser, cb_payment.getValue().toString())) {
-                        l_checkout.setText("Grazie per l'acquisto!");
-                        cartButton.setGraphic(initImageView("assets/cart.png",17,17));
-                        cartButton.setText("");
+                btn_checkout.setDisable(true);
+                if (cart.getCartSize() > 0) {
+                    cart.checkoutCart(loggedUser, cb_payment.getValue().toString());
+                    VBox v_checkout = new VBox();
+                    Label l_checkout = new Label("Almeno uno o più prodotti in quantità insufficiente");
+                    try {
+                        if (cart.checkoutCart(loggedUser, cb_payment.getValue().toString())) {
+                            l_checkout.setText("Grazie per l'acquisto!");
+                            cartButton.setGraphic(initImageView("assets/cart.png", 17, 17));
+                            cartButton.setText("");
+                        }
+                    } catch (BuyingException bexc) {
+                        l_checkout.setText("Errore nel db!");
+                        bexc.printStackTrace();
                     }
-                }catch (BuyingException bexc){
-                    l_checkout.setText("Errore nel db!");
-                    bexc.printStackTrace();
-                }
-                v_checkout.getChildren().add(l_checkout);
+                    v_checkout.getChildren().add(l_checkout);
 
-                Scene dialog = new Scene(v_checkout);
-                cartInStage.setScene(dialog);
-                cartInStage.setOpacity(0.95);
-                cartInStage.setMinWidth(50);
-                cartInStage.show();
+                    Scene dialog = new Scene(v_checkout);
+                    cartInStage.setScene(dialog);
+                    cartInStage.setOpacity(0.95);
+                    cartInStage.setMinWidth(50);
+                    btn_checkout.setDisable(false);
+                    cartInStage.show();
+                }else {
+                    totalPriceLabel.setText("Your cart is empty!");
+                    btn_checkout.setDisable(false);
+                }
             }
         });
 

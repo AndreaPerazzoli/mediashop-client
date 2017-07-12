@@ -91,6 +91,14 @@ public class Cart implements Iterable<Product> {
         }
     }
 
+    public Double getCartPrice(){
+        Double result=0.0;
+        for(Product product : getCartContent()){
+            result += (product.getPrice().doubleValue() * quantityToBuy.get(product.getId()));
+        }
+        return result;
+    }
+
     /**
      * Checkout products in the Cart
      * @param user

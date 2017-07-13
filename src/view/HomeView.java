@@ -487,7 +487,13 @@ public class HomeView extends Application{
             b_changeQuantity.setOnAction(new EventHandler<ActionEvent>() {
                 @Override
                 public void handle(ActionEvent e) {
-                    cart.setProductQuantity(p,Integer.parseInt(f_quantity.getText()));
+                    try {
+                        f_quantity.setStyle(null);
+                        cart.setProductQuantity(p, Integer.parseInt(f_quantity.getText()));
+                    }catch (NumberFormatException numexc){
+                        f_quantity.setStyle("-fx-border-color: red ; -fx-border-width: 2px ;");
+
+                    }
                     if (cart.getCartSize() == 0){
                         cartButton.setGraphic(initImageView("assets/cart.png",17,17));
                         cartButton.setText("");
